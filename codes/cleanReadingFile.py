@@ -444,7 +444,7 @@ def readFile(file_to_open):
 
                                             if duration > self.time_allowed_to_display_events:
                                                 index_max_sum = [np.sum(l) for l in data_LG].index(
-                                                    np.max([np.sum(l) for l in data_LG]))
+                                                    np.mTextax([np.sum(l) for l in data_LG]))
                                                 self.data_electronics_LG = data_LG[index_max_sum]
                                                 self.data_electronics_HG = data_HG[index_max_sum]
                                                 self.data_electronics_tot = data_time[index_max_sum]
