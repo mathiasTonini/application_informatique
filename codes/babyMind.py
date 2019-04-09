@@ -72,21 +72,24 @@ def makeEventListFromFile(file):
                             ## Chercher l'évenemnt associer
                             IDCurrentEvent=int(line[5:length(line)],2)-268435456 ## #to verify the bits taken and the substraction
                             for k in treatingEvent: #Recherche de l'évenement associer
-                                if k.getID=IDCurrentEvent
+                                if (k.getID == IDCurrentEvent):
                                     k.changeTrailer1=True
-                                    if (k.getTrailer1 and k.getTrailer2)
-                                        treatingEvent.remove(k)
-                                        ## TO DO: CHECK IF REAL EVENT:
+                                    if (k.getTrailer1 and k.getTrailer2):
+                                        if (sum(k.getPixels) != 0): #Si c'est un vrai évenement on le considère
+                                            listEvent.append(k)
+                                        treatingEvent.remove(k) # on a finit de traiter cet évenement
                                     break;
                         elif (Word_Id == Gtrig_trailer_2_Id):
                             ##Chercher l'évènme associer, vérifier si c'est la fin de l'évenement
                             IDCurrentEvent=int(line[12:length(line)],2)-536870912 #to verify the bits taken and the substraction
-                            if k.getID=IDCurrentEvent
-                                k.changeTrailer2=True
-                                if (k.getTrailer1 and k.getTrailer2)
-                                    treatingEvent.remove(k)
-                                    ## TO DO: CHECK IF REAL EVENT:
-                                break;
+                            for k in treatingEvent:
+                                if (k.getID == IDCurrentEvent):
+                                    k.changeTrailer2=True
+                                    if (k.getTrailer1 and k.getTrailer2):
+                                        if (sum(k.getPixels) != 0): #Si c'est un vrai évenement on le considère
+                                            listEvent.append(k)
+                                        treatingEvent.remove(k) #On a finit de traiter cet évenemnt
+                                    break;
                         line = file.read(4)
                         nbLigne=nbLigne+1
                         print(nbLigne)
