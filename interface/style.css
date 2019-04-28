@@ -1,0 +1,752 @@
+.pixel{
+        padding: 0 0 0 0;
+        margin: 0 0 0 0;
+        width:43px:
+        height:33px;
+}
+#entry{
+        position: relative;
+        background-color: gray;
+        width:40%;
+        height: 700px;
+}
+#pixelsDIV{
+        background-color: blue;
+        position: relative;
+        left: 110%;
+        width: 900px;
+        height: 700px;
+        bottom: 385px;
+}
+#ruche{
+        background-color: white;
+        position:absolute;
+        top: 10px;
+        left: 10px;
+        width: 600px;
+        height: 600px;
+}
+#pix0{
+        position: absolute;
+        top: 125px;
+        right: 380px;
+}
+#pix1{
+        position: absolute;
+        top: 125px;
+        right: 340px;
+}
+#pix2{
+        position: absolute;
+        top:100px;
+        right:320px;
+}
+#pix3{
+        position: absolute;
+        top: 100px;
+        right: 280px;
+}
+#pix4{
+        position: absolute;
+        top: 125px;
+        right: 300px;
+}
+#pix5{
+        position: absolute;
+        top: 125px;
+        right: 260px;
+}
+#pix6{
+        position: absolute;
+        top: 150px;
+        right: 360px;
+}
+#pix7{
+        position: absolute;
+        top: 150px;
+        right: 320px;
+}
+#pix8{
+        position: absolute;
+        top: 150px;
+        right: 240px;
+}
+#pix9{
+        position: absolute;
+        top: 125px;
+        right: 220px;
+}
+#pix11{
+        position: absolute;
+        top: 150px;
+        right: 280px;
+}
+#pix10{
+        position: absolute;
+        top: 175px;
+        right: 300px;
+}
+#pix12{
+        position: absolute;
+        top:75px;
+        right: 260px;
+}
+#pix13{
+        position: absolute;
+        top: 75px;
+        right: 220px;
+}
+
+#pix14{
+        position: absolute;
+        top:50px;
+        right: 200px;
+}
+#pix15{
+        position: absolute;
+        top: 50px;
+        right: 160px;
+}
+#pix16{
+        position: absolute;
+        top: 75px;
+        right: 180px;
+}
+#pix17{
+        position: absolute;
+        top: 75px;
+        right: 140px;
+}
+#pix18{
+        position: absolute;
+        top:100px;
+        right: 240px;
+}
+#pix19{
+        position: absolute;
+        top:100px;
+        right: 200px;
+}
+#pix20{
+        position: absolute;
+        top: 100px;
+        right: 120px;
+}
+#pix21{
+        position: absolute;
+        top: 75px;
+        right: 100px;
+}
+#pix22{
+        position: absolute;
+        top: 125px;
+        right: 180px;
+}
+#pix23{
+        position: absolute;
+        top: 100px;
+        right: 160px;
+}
+#pix24{
+        position: absolute;
+        top: 25px;
+        right:380px;
+}
+#pix25{
+        position: absolute;
+        top:25px;
+        right: 340px;;
+}
+#pix26{
+        position: absolute;
+        top:1px;
+        right:279px;
+}
+#pix27{
+        position: absolute;
+        right:321px;
+        top:1px;
+}
+#pix28{
+        position: absolute;
+        right:300px;
+        top: 25px;
+}
+#pix29{
+        position: absolute;
+        top:25px;
+        right:260px;
+}
+#pix30{
+        position: absolute;
+        top: 50px;
+        right: 360px;
+}
+#pix31{
+        position: absolute;
+        top:50px;
+        right:320px;
+}
+#pix32{
+        position: absolute;
+        top:50px;
+        right: 240px;
+}
+#pix33{
+        position: absolute;
+        top: 25px;
+        right: 220px;
+}
+#pix34{
+        position: absolute;
+        top:75px;
+        right:300px;
+}
+#pix35{
+        position: absolute;
+        top:50px;
+        right:280px;
+}
+#pix36{
+        position: absolute;
+        top: 75px;
+        right: 500px;
+}
+#pix37{
+        position: absolute;
+        top: 75px;
+        right: 460px;
+}
+#pix38{
+        position: absolute;
+        top: 50px;
+        right: 440px;
+}
+#pix39{
+        position: absolute;
+        top: 50px;
+        right: 400px;
+}
+#pix40{
+        position: absolute;
+        top: 75px;
+        right: 420px;
+}
+
+#pix41{
+        position: absolute;
+        top: 75px;
+        right: 380px;
+}
+#pix42{
+        position: absolute;
+        top: 100px;
+        right: 480px;
+}
+#pix43{
+        position: absolute;
+        top: 100px;
+        right: 440px;
+}
+#pix44{
+        position: absolute;
+        top: 100px;
+        right: 360px;
+}
+#pix45{
+        position: absolute;
+        top: 75px;
+        right: 340px;
+}
+#pix47{
+        position: absolute;
+        top: 100px;
+        right: 400px;
+}
+#pix46{
+        position: absolute;
+        top: 125px;
+        right: 420px;
+}
+#pix48{
+        position: absolute;
+        top: 250px;
+        right: 360px;
+}
+#pix49{
+        position: absolute;
+        top: 225px;
+        right: 380px;
+}
+#pix50{
+        position: absolute;
+        top:225px;
+        right: 420px;
+}
+#pix51{
+        position: absolute;
+        top: 200px;
+        right: 440px;
+}
+#pix52{
+        position: absolute;
+        top: 200px;
+        right: 400px;
+}
+#pix53{
+        position: absolute;
+        top: 175px;
+        right: 420px;
+}
+#pix54{
+        position: absolute;
+        top: 225px;
+        right:340px;
+}
+#pix55{
+        position: absolute;
+        top: 200px;
+        right: 360px;
+}
+#pix56{
+        position: absolute;
+        top: 150px;
+        right: 400px;
+}
+#pix57{
+        position: absolute;
+        top: 150px;
+        right: 440px;
+}
+#pix58{
+        position: absolute;
+        top: 175px;
+        right: 340px;
+}
+#pix59{
+        position: absolute;
+        top: 175px;
+        right: 380px;
+}
+#pix60{
+        position: absolute;
+        top: 200px;
+        right: 480px;
+}
+#pix61{
+        position: absolute;
+        top: 175px;
+        right: 500px;
+}
+#pix62{
+        position: absolute;
+        top: 175px;
+        right: 540px;
+}
+#pix63{
+        position: absolute;
+        top: 150px;
+        right: 560px;
+}
+#pix64{
+        position: absolute;
+        top: 150px;
+        right: 520px;
+}
+#pix65{
+        position: absolute;
+        top:125px;
+        right:540px;
+}
+#pix66{
+        position: absolute;
+        top: 175px;
+        right: 460px;
+}
+#pix67{
+        position: absolute;
+        top: 150px;
+        right: 480px;
+}
+#pix68{
+        position: absolute;
+        top: 100px;
+        right: 520px;
+}
+#pix69{
+        position: absolute;
+        top: 100px;
+        right: 560px;
+}
+#pix70{
+        position: absolute;
+        top: 125px;
+        right: 460px;
+}
+#pix71{
+        position: absolute;
+        top: 125px;
+        right: 500px;
+}
+#pix72{
+        position: absolute;
+        top: 300px;
+        right: 480px;
+}
+#pix73{
+        position: absolute;
+        top: 275px;
+        right: 500px;
+}
+#pix74{
+        position: absolute;
+        top: 275px;
+        right: 540px;
+}
+#pix75{
+        position: absolute;
+        top: 250px;
+        right: 560px;
+}
+#pix76{
+        position: absolute;
+        top: 250px;
+        right: 520px;
+}
+#pix77{
+        position: absolute;
+        top: 225px;
+        right: 540px;
+}
+#pix78{
+        position: absolute;
+        top: 275px;
+        right: 460px;
+}
+#pix79{
+        position: absolute;
+        top: 250px;
+        right: 480px;
+}
+#pix80{
+        position: absolute;
+        top: 200px;
+        right: 520px;
+}
+#pix81{
+        position: absolute;
+        top: 200px;
+        right: 560px;
+}
+#pix82{
+        position: absolute;
+        top: 225px;
+        right: 460px;
+}
+#pix83{
+        position: absolute;
+        top: 225px;
+        right: 500px;
+}
+#pix84{
+        position: absolute;
+        top: 350px;
+        right: 360px;
+}
+#pix85{
+        position: absolute;
+        top: 325px;
+        right: 380px;
+}
+#pix86{
+        position: absolute;
+        top: 325px;
+        right: 420px;
+}
+#pix87{
+        position: absolute;
+        top: 300px;
+        right: 440px;
+}
+#pix88{
+        position: absolute;
+        top: 300px;
+        right: 400px;
+}
+#pix89
+{
+        position: absolute;
+        top: 275px;
+        right: 420px;
+}
+#pix90{
+        position: absolute;
+        top: 325px;
+        right: 340px;
+}
+#pix91{
+        position: absolute;
+        top: 300px;
+        right: 360px;
+}
+#pix92{
+        position: absolute;
+        top: 250px;
+        right: 400px;
+}
+#pix93{
+        position: absolute;
+        top: 250px;
+        right: 440px;
+}
+#pix94{
+        position: absolute;
+        top: 275px;
+        right: 340px;
+}
+#pix95{
+        position: absolute;
+        top: 275px;
+        right: 380px;
+}
+#pix96{
+        position: absolute;
+        top: 175px;
+        right: 220px;
+}
+
+#pix97{
+        position: absolute;
+        top: 200px;
+        right: 240px;
+}
+#pix98{
+        position: absolute;
+        top: 225px;
+        right: 220px;
+}
+#pix99{
+        position: absolute;
+        top: 250px;
+        right: 240px;
+}
+#pix100{
+        position: absolute;
+        top: 225px;
+        right: 260px;
+}
+#pix101{
+        position: absolute;
+        top: 250px;
+        right: 280px;
+}
+#pix102{
+        position: absolute;
+        top: 175px;
+        right: 260px;
+}
+#pix103{
+        position: absolute;
+        top: 200px;
+        right: 280px;
+}
+#pix104{
+        position: absolute;
+        top: 250px;
+        right: 320px;
+}
+#pix105{
+        position: absolute;
+        top: 275px;
+        right: 300px;
+}
+#pix106{
+        position: absolute;
+        top: 200px;
+        right: 320px;
+}
+#pix107{
+        position: absolute;
+        top: 225px;
+        right: 300px;
+}
+#pix108{
+        position: absolute;
+        top: 275px;
+        right: 220px;
+}
+#pix109{
+        position: absolute;
+        top: 300px;
+        right: 240px;
+}
+#pix110{
+        position: absolute;
+        top: 325px;
+        right: 220px;
+}
+#pix111{
+        position: absolute;
+        top: 350px;
+        right: 240px;
+}
+#pix112{
+        position: absolute;
+        top: 325px;
+        right: 260px;
+}
+#pix113{
+        position: absolute;
+        top: 350px;
+        right: 280px;
+}
+#pix114{
+        position: absolute;
+        top: 275px;
+        right: 260px;
+}
+#pix115{
+        position: absolute;
+        top: 300px;
+        right: 280px;
+}
+#pix116{
+        position: absolute;
+        top: 350px;
+        right: 320px;
+}
+#pix117{
+        position: absolute;
+        top: 375px;
+        right: 300px;
+}
+#pix118{
+        position: absolute;
+        top: 300px;
+        right: 320px;
+}
+#pix119{
+        position: absolute;
+        top: 325px;
+        right: 300px;
+}
+#pix120{
+        position: absolute;
+        top: 225px;
+        right: 100px;
+}
+#pix121{
+        position: absolute;
+        top: 250px;
+        right: 120px;
+}
+#pix122{
+        position: absolute;
+        top: 275px;
+        right: 100px;
+}
+#pix123{
+        position: absolute;
+        top: 300px;
+        right: 120px;
+}
+#pix124{
+        position: absolute;
+        top: 275px;
+        right: 140px;
+}
+#pix125{
+        position: absolute;
+        top: 300px;
+        right: 160px;
+}
+#pix126{
+        position: absolute;
+        top: 225px;
+        right: 140px;
+}
+#pix127{
+        position: absolute;
+        top: 250px;
+        right: 160px;
+}
+#pix128{
+        position: absolute;
+        top: 300px;
+        right: 200px;
+}
+#pix129{
+        position: absolute;
+        top: 325px;
+        right: 180px;
+}
+#pix130{
+        position: absolute;
+        top: 250px;
+        right: 200px;
+}
+#pix131{
+        position: absolute;
+        top: 275px;
+        right: 180px;
+}
+#pix132{
+        position: absolute;
+        top: 125px;
+        right: 100px;
+}
+#pix133{
+        position: absolute;
+        top: 150px;
+        right: 120px;
+}
+#pix134{
+        position: absolute;
+        top: 175px;
+        right: 100px;
+}
+#pix135{
+        position: absolute;
+        top: 200px;
+        right: 120px;
+}
+#pix136{
+        position: absolute;
+        top: 175px;
+        right: 140px;
+}
+#pix137{
+        position: absolute;
+        top: 200px;
+        right: 160px;
+}
+#pix138{
+        position: absolute;
+        top: 125px;
+        right: 140px;
+}
+#pix139{
+        position: absolute;
+        top: 150px;
+        right: 160px;
+}
+#pix140{
+        position: absolute;
+        top: 200px;
+        right: 200px;
+}
+#pix141{
+        position: absolute;
+        top: 225px;
+        right:180px;
+}
+#pix142{
+        position: absolute;
+        top: 150px;
+        right: 200px;
+}
+#pix143{
+        position: absolute;
+        top: 175px;
+        right: 180px;
+}
