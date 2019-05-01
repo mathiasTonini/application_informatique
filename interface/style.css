@@ -7,16 +7,18 @@
 #entry{
         position: relative;
         background-color: gray;
+        top: 25px;
         width:40%;
         height: 700px;
 }
 #pixelsDIV{
         background-color: blue;
         position: relative;
+        top: -200px;
         left: 110%;
         width: 900px;
         height: 700px;
-        bottom: 385px;
+
 }
 #ruche{
         background-color: white;
@@ -76,15 +78,15 @@
         top: 125px;
         right: 220px;
 }
-#pix11{
-        position: absolute;
-        top: 150px;
-        right: 280px;
-}
 #pix10{
         position: absolute;
         top: 175px;
         right: 300px;
+}
+#pix11{
+        position: absolute;
+        top: 150px;
+        right: 280px;
 }
 #pix12{
         position: absolute;
@@ -160,11 +162,11 @@
 #pix26{
         position: absolute;
         top:1px;
-        right:279px;
+        right:320px;
 }
 #pix27{
         position: absolute;
-        right:321px;
+        right:280px;
         top:1px;
 }
 #pix28{
@@ -258,15 +260,15 @@
         top: 75px;
         right: 340px;
 }
-#pix47{
-        position: absolute;
-        top: 100px;
-        right: 400px;
-}
 #pix46{
         position: absolute;
         top: 125px;
         right: 420px;
+}
+#pix47{
+        position: absolute;
+        top: 100px;
+        right: 400px;
 }
 #pix48{
         position: absolute;

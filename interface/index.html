@@ -4,49 +4,59 @@
   <meta charset="utf-8">
   <title>baby mind web interface</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="script.js"></script>
 </head>
 <body>
         <div id='interface'>
                 <div id='entry'>
-                        <div id='threshold_HG'> <p> Threshold HG: </p> </div>
-                        <div id='threshold_LG'> <p> Threshold LG: </p> </div>
-                        <div id='threshold_DAC'> <p> Threshold DAC: </p> </div>
+                        <div>
+                                <label for="var">threshold HG :</label>
+                                <input type="number" id="threshold_HG" name="threshold_HG">
+                        </div>
+                                <label for="var">threshold LG </label>
+                                <input type="number" id="threshold_LG" name="threshold_LG">
+                        <div >
+                                <label for="var">threshold DAC </label>
+                                <input type="number" id="threshold_DAC" name="threshold_DAC">
+                        </div>
+                        <div>
+                         </div>
                         <div id='Canon'>
                                 <div id='GAIN'>
-                                        <input type="radio" id="HG" name="HG" value="HG">
+                                         Gain(HG/LG)
+                                        <input type="radio" id="HG" name="gain" value="HG">
                                                 <label for="HG">HG</label>
-                                        <input type="radio" id="LG" name="lG" value="LG">
+                                        <input type="radio" id="LG" name="gain" value="LG">
                                                 <label for="LG">LG</label>
-                                        <input type="radio" id="TOT" name="TOT" value="TOT">
+                                        <input type="radio" id="TOT" name="gain" value="TOT">
                                                 <label for="TOT">TOT</label>
                                 <div id='trigger_conf'>
-                                        <p>Choose Triger conf:
+                                        Choose Triger conf:
                                             <FORM>
-                                            <SELECT name="trigerConf" size="1">
-                                            <OPTION>1
-                                            <OPTION>2
-                                            <OPTION>3
+                                            <SELECT name="trigerConf" size="1" id='confForm'>
+                                            <OPTION value='1'>1
+                                            <OPTION value='2'>2
+                                            <OPTION value='3'>3
                                             </SELECT>
                                             </FORM>
-                                        </p>
+
+                                </div>
+                                <div>
+                                        <label for="var">average DAC in trigger choosen:  </label>
+                                        <input type="number" id="averageDAC" name="averageDAC">
                                 </div>
                                 <div id='trigerChoosen'>
+                                        Choose
                                         <FORM>
-                                        <SELECT name="trigerConf" size="1">
-                                        <OPTION>DAC
-                                        <OPTION>PE
-                                        <OPTION>Eie
-                                        <OPTION>TEMP
+                                        <SELECT name="trigerChoosForm" size="1" id='triggerChoosenForm'>
+                                        <OPTION value='DAC'>DAC
+                                        <OPTION value='PE'>PE
+                                        <OPTION value='Eie'>Eie
+                                        <OPTION value='Temp'>TEMP
                                         </SELECT>
                                         </FORM>
                                 </div>
-                                <div id='start_it'>
-                                        <button type='button'>
-                                        start To lauch: Start_it function from class canon
-                                        </button>
-                                </div>
-                                <div id='stop'>
+
+                                <!-- <div id='stop'>
                                         <button type='button'>
                                         stop
                                         </button>
@@ -55,12 +65,35 @@
                                         <button type='button'>_
                                         pause
                                         </button>
+                                </div> -->
+                                <div id='selectionDrawTrigger'>
+                                        <div id='fromTo'>
+                                                 choose Threshold from:
+                                                <input type="number" name="thresholdFrom" id="thresholdFrom">
+                                                <label for="var"> choose Threshold to: </label>
+                                                <input type="number" id="thresholdTo" name="thresholdTo">
+
+                                        </div>
+                                        <div >
+                                                LG or HG
+                                                <FORM>
+                                                <SELECT name="choice" size="1" id='LGorHG'>
+                                                <OPTION value='LG'>LG
+                                                <OPTION value='HG'>HG
+
+                                                </SELECT>
+                                                </FORM>
+                                                <label for="var"> step of:  </label>
+                                                <input type="number" id="step" name="step">
+                                        </div>
+
+                                        <div id='drawCoscmicFlux'>
+                                                <button  id='drawCoscmicFluxButton'>
+                                                        draw trigger effisciency and cosmic ray flux
+                                                </button>
+                                        </div>
                                 </div>
-                                <div id='drawCoscmicFlux'>
-                                        <button type='button'>
-                                        start function _draw_trigger_rate_and_cosmic_flux
-                                        </button>
-                                </div>
+
                         </div>
                 </div>
                 <div id = 'pixelsDIV'>
@@ -932,6 +965,8 @@
                         </div>
                 </div>
         </div>
+
+<script src="babyMind.js"></script>
 
 </body>
 </html>

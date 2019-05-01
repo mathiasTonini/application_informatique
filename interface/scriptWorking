@@ -12,16 +12,13 @@ from matplotlib.patches import Polygon
 import matplotlib.pyplot as plt
 from tkinter import *
 import matplotlib
-import serial
-
-import usb.core
-import usb.util
-
+import plotly
+import plotly.tools as tls
+#import serial
+#import usb.core
+#import usb.util
 from collections import deque
-
-import can
-
-
+#import can
 matplotlib.use("TkAgg")
 from numpy import arange, sin, pi
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -30,13 +27,12 @@ from matplotlib import cm, colors
 import matplotlib.animation as animation
 import sys
 import os
-import socket
+#import socket
 from tkinter import messagebox,ttk
 import threading
 import matplotlib.image as image
 import multiprocessing
 #from scipy.spatial import KDTree as KDTree
-
 
 class Canon:
     """Initialisation of elemnt in my GUI
@@ -55,7 +51,7 @@ class Canon:
 
         """
 
-    def __init__(self, fen1, flag_start, comm, usb2can, entr1, var_threshold, entr14, var_threshold_HG, entr15,
+    def __init__(self, fen1, flag_start, entr1, var_threshold, entr14, var_threshold_HG, entr15,
                  var_threshold_LG):
         self.x_center = 0 #Camera x_center
         self.y_center = 0 #Camera y_center
@@ -73,17 +69,17 @@ class Canon:
         self.entr14, self.var_threshold_HG, self.entr15, self.var_threshold_LG=entr14,var_threshold_HG,entr15,var_threshold_LG
         self.threshold_HG,self.threshold_LG=int(self.entr14.get()),int(self.entr15.get())
 
-        self.new_file_to_write = "D:/resultat_acquisition_babymind/_new_file_to_write.daq" # result file where i will writing my event data for later access
+        self.new_file_to_write = "/home/mathias/Documents/unige/UNIGE/2eme/appliInfo/script/folder_result_acquisition_babymind/_new_file_to_write.daq" # result file where i will writing my event data for later access
 
-        self.file_to_analyze_rate= "D:/resultat_acquisition_babymind/_file_to_analyze_rate.daq" # file where i will put results for analysing rate
+        self.file_to_analyze_rate= "/home/mathias/Documents/unige/UNIGE/2eme/appliInfo/script/folder_result_acquisition_babymind/_file_to_analyze_rate.daq" # file where i will put results for analysing rate
 
         #this are the config files and C sharp script to taking data
-        self.config_file_init_0= "D:/resultat_acquisition_babymind/config_scriptApplib_files/init_config_b0.xml"
-        self.config_file_init_1 = "D:/resultat_acquisition_babymind/config_scriptApplib_files/init_config_b1.xml"
-        self.config_file_aux_0 = "D:/resultat_acquisition_babymind/config_scriptApplib_files/aux_config_b0.xml"
-        self.config_file_aux_1 = "D:/resultat_acquisition_babymind/config_scriptApplib_files/aux_config_b1.xml"
-        #self.script_cs="D:/resultat_acquisition_babymind/config_scriptApplib_files/daq-tdm-Applib-slotArray-v1.cs"
-        self.script_cs = "D:/resultat_acquisition_babymind/config_scriptApplib_files/scriptmainargs.cs"
+        self.config_file_init_0= "/home/mathias/Documents/unige/UNIGE/2eme/appliInfo/script/folder_result_acquisition_babymind/init_config_b0.xml"
+        self.config_file_init_1 = "/home/mathias/Documents/unige/UNIGE/2eme/appliInfo/script/folder_result_acquisition_babymind/init_config_b1.xml"
+        self.config_file_aux_0 = "/home/mathias/Documents/unige/UNIGE/2eme/appliInfo/script/folder_result_acquisition_babymind/aux_config_b0.xml"
+        self.config_file_aux_1 = "/home/mathias/Documents/unige/UNIGE/2eme/appliInfo/script/folder_result_acquisition_babymind/aux_config_b1.xml"
+        #self.script_cs="/home/sterody/Documents/mini_cam_event_display/resultat_acquisition_babymind/config_scriptApplib_files/daq-tdm-Applib-slotArray-v1.cs"
+        self.script_cs = "/home/mathias/Documents/unige/UNIGE/2eme/appliInfo/script/folder_result_acquisition_babymind/scriptmainargs.cs"
 
         #configuration regard for the mapping.
         self.order_list_of_pixels_in_reading_temperature = [98, 99, 112, 113, 87, 88, 100, 101, 76, 89, 90, 102, 124, 125,
@@ -99,7 +95,7 @@ class Canon:
 
 
         self.flag_store_temperature = 0 # flag to store temperature
-        self.temperature_file = "D:/resultat_acquisition_babymind/folder_to_test_readout_temperature/push_pull_T.txt" #temperature file where i will store temperature
+        self.temperature_file = "/home/mathias/Documents/unige/UNIGE/2eme/appliInfo/script/folder_result_acquisition_babymind/folder_to_test_readout_temperature/push_pull_T.txt" #temperature file where i will store temperature
 
         #initialisation variables
         self.list_mean_cosmicray_rate_HG=[]
@@ -137,11 +133,6 @@ class Canon:
         self.old_dict_pixelid_values_tot_for_histo_global = dict(
             (i, Hist1D_global(self.bin_array_tot[i], 0, 5000, i)) for i in np.arange(144))
 
-        self.comm=comm
-
-        self.usb2can=usb2can
-
-        # self.power_supply=power_supply
 
         self.var_pause_restart = 1 # initial value for the pause restart (b5) button
 
@@ -165,7 +156,7 @@ class Canon:
         self.txt2.grid(row=3, column=1, sticky='NSEW')
 
         self.value_hg_or_lg = StringVar()
-        self.value_hg_or_lg.set("LG")
+        self.value_hg_or_lg.set("HG")
         self.bouton1 = Radiobutton(self.fen1, text="HG", variable=self.value_hg_or_lg, value="HG")
         self.bouton1.grid(row=3, column=2, sticky='NSEW')
         self.bouton2 = Radiobutton(self.fen1, text="LG", variable=self.value_hg_or_lg, value="LG")
@@ -177,7 +168,7 @@ class Canon:
         self.b3 = Button(self.fen1, text='Start', command=self.start_it)
         self.b3.grid(row=2, column=5, sticky='NSEW')
 
-        self.b4 = Button(self.fen1, text='Stop', cofile_for_acquisition_datammand=self.stop_it)
+        self.b4 = Button(self.fen1, text='Stop', command=self.stop_it)
         self.b4.grid(row=3, column=5, sticky='NSEW')
 
         self.txt4 = Label(self.fen1, text="Choose trigger conf:")
@@ -222,7 +213,7 @@ class Canon:
 
         self.txt9 = Label(self.fen1, text='choose time \n for data \n acquisition(sec):')
         self.txt9.grid(row=7, column=1, sticky='NSEW')
-        file_for_acquisition_data
+
         self.var_time_in_data_acquisition = StringVar(self.fen1)
         self.var_time_in_data_acquisition.set("280")
         self.entr9 = Spinbox(self.fen1, from_=0, to=18000, textvariable=self.var_time_in_data_acquisition)
@@ -278,6 +269,7 @@ class Canon:
         self.txt11.grid(row=12, column=1, rowspan=2,columnspan=5, sticky='NSEW')
 
         self.reatribute_id_pixels = self.make_mini_cam_mathieu_with_node(23.2) # one method to Create and Make the mapping of minicamera
+        print(type(self.reatribute_id_pixels))
 
         self.find_neighboors_pixels_by_my_method() # method to find the neighboors of pixels
 
@@ -288,6 +280,7 @@ class Canon:
 
         self.number_figure = 0 # when you save events, figure number begin by this
 
+        ## Fais la ruche de pixel
         self.fig_fen1 = plt.figure(facecolor="green")
         self.axes_fen1 = self.fig_fen1.add_subplot(111)
         self.canvas_fen1 = FigureCanvasTkAgg(self.fig_fen1, master=self.fen1)
@@ -296,7 +289,7 @@ class Canon:
         self.toolbar_frame_fen1.grid(row=1, column=6)
         self.toolbar_fen1 = NavigationToolbar2Tk(self.canvas_fen1, self.toolbar_frame_fen1)
         self.canvas_fen1._tkcanvas.grid(row=1, column=6, rowspan=8, padx=10, pady=5, sticky='NSEW')
-        self.canvas_fen1.show()
+        # self.canvas_fen1.show()
         if self.box_choice.get() == "Temp":
             self.norm1 = matplotlib.colors.Normalize(0, 35)
         else:
@@ -310,6 +303,7 @@ class Canon:
         self.cmap1.set_array([])
         self.cb_fen1 = self.fig_fen1.colorbar(self.cmap1)  # , ticks=facecolor)
 
+
         self.dict_polygones={}
         list_centers_xs = []
         list_centers_ys = []
@@ -320,6 +314,7 @@ class Canon:
             list_centers_ys.append(polygons_data[1][1])
 
             # if you want to draw the camera pixels id in the camera
+
             self.draw_camera_pixel_ids(polygons_data[1][0], polygons_data[1][1], pixels_id, self.axes_fen1)
 
 
@@ -758,11 +753,11 @@ class Canon:
                                                                        self.pixel_to_draw_histo]), 1))
 
             except KeyError:
-                image_warning_pixel_triggered_or_not = image.imread(
-                    "D:/resultat_acquisition_babymind/warning_pixel_no_triggered_2.png")
-                self.axs_histo_0.imshow(image_warning_pixel_triggered_or_not)
-                self.axs_histo_1.imshow(image_warning_pixel_triggered_or_not)
-                self.axs_histo_2.imshow(image_warning_pixel_triggered_or_not)
+                # image_warning_pixel_triggered_or_not = image.imread(
+                #     "/home/sterody/Documents/mini_cam_event_display/resultat_acquisition_babymind/warning_pixel_no_triggered_2.png")
+                # self.axs_histo_0.imshow(image_warning_pixel_triggered_or_not)
+                # self.axs_histo_1.imshow(image_warning_pixel_triggered_or_not)
+                # self.axs_histo_2.imshow(image_warning_pixel_triggered_or_not)
 
                 print("There is not this pixels key in the pixels who have triggered")
 
@@ -991,10 +986,10 @@ class Canon:
 
 
             except KeyError:
-                image_warning_pixel_triggered_or_not = image.imread(
-                    "D:/resultat_acquisition_babymind/warning_pixel_no_triggered_2.png")
-                self.axs_histo_0.imshow(image_warning_pixel_triggered_or_not)
-                self.axs_histo_1.imshow(image_warning_pixel_triggered_or_not)
+                # image_warning_pixel_triggered_or_not = image.imread(
+                #     "/home/sterody/Documents/mini_cam_event_display/resultat_acquisition_babymind/warning_pixel_no_triggered_2.png")
+                # self.axs_histo_0.imshow(image_warning_pixel_triggered_or_not)
+                # self.axs_histo_1.imshow(image_warning_pixel_triggered_or_not)
 
                 print("There is not this pixels key in the pixels who have triggered")
 
@@ -1065,33 +1060,6 @@ class Canon:
         answer = messagebox.askyesnocancel("Quit", "Are You Sure?", icon='warning')
 
         if answer:
-            # Close the socket server
-            try:
-                self.comm.deconnect()
-                time.sleep(1)
-
-                if self.usb2can.flag_connect_usb2can==1 or self.usb2can.flag_HV_ON==1:
-                    self.usb2can.set_HV_OFF_PDP()
-                    self.usb2can.shutdown_interface_usb2can_Ixxat()
-                #self.comm.deconnect()
-
-
-                # #self.power_supply.Communicate("Opall 0\n")
-                # power_supply.Communicate('INST OUT1\n')
-                # power_supply.Communicate('OUTP OFF\n')
-                # power_supply.Communicate('INST OUT2\n')
-                # power_supply.Communicate('OUTP OFF\n')
-                # power_supply.Communicate('INST OUT3\n')
-                # power_supply.Communicate('OUTP OFF\n')
-                time.sleep(1)
-            except:
-                # print("Error in stopped socket server")
-                self._update_box_messages("Error in stopped socket server")
-                sys.exit(1)
-
-            time.sleep(2)
-
-
 
             if self.flag_1 != 0: #test if we are enter in the subprocess create file.this means that stop function has never been activated
                 self.stop_it()  # stop properly all (socket server, file writting and reading, ...)
@@ -1132,22 +1100,10 @@ class Canon:
         if self.flag_store_temperature!=0:
             self.temperature_file.close()
 
-        # send command to stop acquisition
-        try:
-            # socket.send(bytes('BoardLib.StopAcquisition()\r', "utf-8"))
-            self.comm.Communicate('BoardLib.StopAcquisition()\r')
-        except:
-            #print("Error in Stoping acquisition data")
-            self._update_box_messages("Error in Stoping acquisition data")
-            sys.exit(1)
         #print("Acquisition of data via socket server has been stopped")
         self._update_box_messages("Acquisition of data via socket server has been stopped")
         time.sleep(2)
 
-        if self.usb2can.flag_connect_usb2can == 1 or self.usb2can.flag_HV_ON == 1:
-            self.usb2can.set_HV_OFF_PDP()
-            self.usb2can.shutdown_interface_usb2can_Ixxat()
-        #self.comm.deconnect()
 
         """"
         #send command to socket server to deactivate time over threshold in taking data
@@ -1248,104 +1204,10 @@ class Canon:
                     #self.b1.config(state="disabled")  # disabling the checkbutton tot
                     self.entr1.config(state="disabled")  # disabling the entry spinbox threshold hardware
 
-                    # #os.system('D:\\resultat_acquisition_babymind\\devcon.exe restart *ROOT_HUB20*')
-                    # #time.sleep(5)
-                    # #self.power_supply.__init__()
-                    # # self.power_supply.Communicate("Opall 1\n")
-                    # power_supply.Communicate('INST OUT1\n')
-                    # power_supply.Communicate('OUTP ON\n')
-                    # power_supply.Communicate('INST OUT2\n')
-                    # power_supply.Communicate('OUTP ON\n')
-                    # power_supply.Communicate('INST OUT3\n')
-                    # power_supply.Communicate('OUTP ON\n')
-                    #'''
-                    if comm.connect_socket_server_on_or_off==0: #test if socket server has never been connected
-                        try:
-                            time.sleep(1)
-                            self.comm.Connect()
-                        except:
-                            #print("Bad connection with socket server")
-                            self._update_box_messages("Bad connection with socket server")
-                            sys.exit(1)
-                        #print("Connection with socket server Enable")
-                        self._update_box_messages("Connection with socket server Enable")
-                        time.sleep(2)
-
-                    if self.usb2can.flag_connect_usb2can==0:
-                        self.usb2can.connect_interface_usb2can_Ixxat()
-                        time.sleep(0.5)
-
-                    if self.usb2can.flag_HV_ON==0:
-                        self.usb2can.set_HV_ON_PDP()
-
-
-
-
-                    try:
-                        # send command to socket server to make and download default configuration file
-
-
-                        self.comm.Communicate('BoardLib.OpenConfigFile("{}")\r'.format(self.config_file_init_0))
-
-                        for i in [0, 1, 2]:
-                            self.comm.Communicate(
-                                'BoardLib.SetVariable("ASICS.ASIC{}.GlobalControl.DAC10b",{})\r'.format(i,self.threshold_DAC))
-                            self.comm.Communicate(
-                                'BoardLib.SetVariable("ASICS.ASIC{}.GlobalControl.DAC10b_t",{})\r'.format(i,
-                                                                                                        self.threshold_DAC))
-                            comm.Communicate(
-                                'BoardLib.SetVariable("FPGA.ASIC{}.GlobalControl.L1ThresholdHG",{})\r'.format(i,self.threshold_HG))
-                            comm.Communicate(
-                                'BoardLib.SetVariable("FPGA.ASIC{}.GlobalControl.L1ThresholdLG",{})\r'.format(i,self.threshold_LG))
-                        """"#send command to socket server to activate or deactivate time over threshold
-                        if self.value_get_data_with_tot.get():
-                            send command on socket server to activate tot
-                        """
-                        self.comm.Communicate('BoardLib.BoardConfigure(SendVerifyApply)\r')
-
-                        self.comm.Communicate('BoardLib.SaveConfigFile("{}")\r'.format(self.config_file_aux_0))
-
-
-
-                        self.comm.Communicate('BoardLib.OpenConfigFile("{}")\r'.format(self.config_file_init_1))
-                        for i in [0, 1, 2]:
-                            self.comm.Communicate(
-                                'BoardLib.SetVariable("ASICS.ASIC{}.GlobalControl.DAC10b",{})\r'.format(i,
-                                                                                                        self.threshold_DAC))
-                            self.comm.Communicate(
-                                'BoardLib.SetVariable("ASICS.ASIC{}.GlobalControl.DAC10b_t",{})\r'.format(i,
-                                                                                                          self.threshold_DAC))
-                            comm.Communicate(
-                                'BoardLib.SetVariable("FPGA.ASIC{}.GlobalControl.L1ThresholdHG",{})\r'.format(i,
-                                                                                                              self.threshold_HG))
-                            comm.Communicate(
-                                'BoardLib.SetVariable("FPGA.ASIC{}.GlobalControl.L1ThresholdLG",{})\r'.format(i,
-                                                                                                              self.threshold_LG))
-                        """"#send command to socket server to activate or deactivate time over threshold
-                        if self.value_get_data_with_tot.get():
-                            send command on socket server to activate tot
-                        """
-                        self.comm.Communicate('BoardLib.BoardConfigure(SendVerifyApply)\r')
-
-                        self.comm.Communicate('BoardLib.SaveConfigFile("{}")\r'.format(self.config_file_aux_1))
-
-                    except:
-                        #print("Error in Assigning value to the DAC10b")
-                        self._update_box_messages("Error in settings config file")
-                        sys.exit(1)
-                    #print("Configure parameters success")
-                    self._update_box_messages("Configure parameters success")
-                    time.sleep(2)
-
-                    self._update_box_messages(" all setting Config files success")
-
                     self.get_entry_entr9 = int(self.entr9.get())
 
                     """"#If i m not drawing trigger rate, i erase all files of previous display
                     if self.flag_draw_trigger_rate == False:"""
-                    folder_result_acquisition_babymind = "D:/resultat_acquisition_babymind/folder_result_acquisition_babymind"  #folder where i store my files that interface produce
-                    for file_object in os.listdir(folder_result_acquisition_babymind):
-                        os.remove(os.path.join(folder_result_acquisition_babymind, file_object))
 
                     self.flag_1 = 1
 
@@ -1445,85 +1307,34 @@ class Canon:
 
         #self.daq_tdm_Applib = 0
 
-        while time_spend_on_acquisition_data < self.get_entry_entr9:
+        folder_result_acquisition_babymind = "/home/mathias/Documents/unige/UNIGE/2eme/appliInfo/interface/folder_result_acquisition_babymind/data"  #folder where i store my files that interface produce
+        self.queue_for_dtata_recorded_by_babymind =[]
+        for file_object in os.listdir(folder_result_acquisition_babymind):
+            # print("la")
+            # aux_name_file_recorded_by_babymind='{}/{}'.format(folder_result_acquisition_babymind,file_object)
+            # if indice_file_taking_data == 0:
+            #     print("Dans le if")
+            #     self.queue_for_dtata_recorded_by_babymind = deque([aux_name_file_recorded_by_babymind])
+            #     if self.flag_draw_trigger_rate == False:
+            #         print("Ici ?")
+            #         self.th3 = threading.Thread(
+            #             target=self.get_boards_values_from_file).start()  # this is to start at same time two functions
+            # else:
+            #     self.queue_for_dtata_recorded_by_babymind.append(aux_name_file_recorded_by_babymind)
+            indice_file_taking_data += 1
+            self.queue_for_dtata_recorded_by_babymind.append(folder_result_acquisition_babymind+"/"+file_object)
+        self.get_boards_values_from_file()
+            #time.sleep(2)
 
-            start_time_on_acquisition_data = time.time()
+        print('\033[91m'+"acquisitiom of data is finish"+'\033[0m')
 
-            aux_name_file_recorded_by_babymind = (
-                    "D:/resultat_acquisition_babymind/folder_result_acquisition_babymind/test_{}.daq".format(indice_file_taking_data))
+        print("time in step 1 ===============",time.time()-start_time_1)
+        self.flag_record_data_in_queu_for_analyse = 0
 
-            print("Start proceess to read daq file and write data in new file")
-
-            #run c sharp script to take data
-            self.daq_tdm_Applib_slotArray_v1(aux_name_file_recorded_by_babymind)
-
-            locked = True
-            file_object = None
-            while locked == True:
-                try:
-                    # Opening file in append mode and read the first 8 characters.
-                    file_object = open(aux_name_file_recorded_by_babymind, "r+b", buffer_size)
-                    if file_object:
-                        locked = False
-                except:
-                    locked = True
-                finally:
-                    if file_object:
-                        file_object.close()
-                        print("taking data is finish in file")
-            time_spend_on_acquisition_data += time.time() - start_time_on_acquisition_data
-            start_time_on_acquisition_data = time.time()
-
-            #read temperature
-            if self.usb2can.flag_connect_usb2can == 1 or self.usb2can.flag_HV_ON == 1:
-                self.usb2can.get_temperature_PDP()
-
-
-            if indice_file_taking_data==0:
-                self.queue_for_dtata_recorded_by_babymind=deque([aux_name_file_recorded_by_babymind])
-
-                self.th3 = threading.Thread(target=self.get_boards_values_from_file).start()  # this is to start at same time two functions
-            else:
-                self.queue_for_dtata_recorded_by_babymind.append(aux_name_file_recorded_by_babymind)
-
-            indice_file_taking_data+=1
-
-            died_time_on_acquisition_data += time.time() - start_time_on_acquisition_data
-
-
-        print("time in step 1 ( time for begining taking data until finish) ===============", time.time() - start_time_1)
-
-        self.flag_record_data_in_queu_for_analyse=0
-
-
-        if self.usb2can.flag_HV_ON==1:
-            self.usb2can.set_HV_OFF_PDP()
-            time.sleep(0.5)
-
-        if self.usb2can.flag_connect_usb2can==1:
-            self.usb2can.shutdown_interface_usb2can_Ixxat()
-            time.sleep(0.5)
-
-        print("died_time=====>",died_time_on_acquisition_data)
-        print('time spend on acquisitioon data=====',time_spend_on_acquisition_data)
-
-        # # self.power_supply.Communicate("Opall 0\n")
-        # power_supply.Communicate('INST OUT1\n')
-        # power_supply.Communicate('OUTP OFF\n')
-        # power_supply.Communicate('INST OUT2\n')
-        # power_supply.Communicate('OUTP OFF\n')
-        # power_supply.Communicate('INST OUT3\n')
-        # power_supply.Communicate('OUTP OFF\n')
-        time.sleep(1)
-
-        if self.flag_draw_trigger_rate == True:
-            self.get_boards_values_from_file()
-            self.stop_it()
-
-        self.flag_can_stop_all=1
 
     def get_boards_values_from_file(self):
-
+        print("get in here")
+        self.numFichier=0
         TDM_ID = 0b1110
         Hit_Amplitude_Id = 0b0011
         Hit_Time_Id = 0b0010
@@ -1542,22 +1353,24 @@ class Canon:
 
         #if len(self.queue_for_dtata_recorded_by_babymind)<=3:
         #    time.sleep(5)
-        while len(self.queue_for_dtata_recorded_by_babymind) < 1:
-            time.sleep(5)
-            pass
+        # while len(self.queue_for_dtata_recorded_by_babymind) < 1:
+        #     time.sleep(5)
+        #     pass
         with open(self.new_file_to_write, "ab")as new_file:
             #while self.flag_record_data_in_queu_for_analyse==1:
                 #if len(self.queue_for_dtata_recorded_by_babymind) == 0:
                 #    time.sleep(5)
             print("queue_for_dtata_recorded_by_babymind====",len(self.queue_for_dtata_recorded_by_babymind))
             while len(self.queue_for_dtata_recorded_by_babymind)>0:
-                file_to_open = self.queue_for_dtata_recorded_by_babymind.popleft()
+                file_to_open = self.queue_for_dtata_recorded_by_babymind[0]
+                del self.queue_for_dtata_recorded_by_babymind[0]
                 print("we analyse now %s in the queue"%file_to_open)
+                print("Remaining file:")
                 print(len(self.queue_for_dtata_recorded_by_babymind))
-                if self.flag_record_data_in_queu_for_analyse != 0 and len(self.queue_for_dtata_recorded_by_babymind)==0:
-                    while len(self.queue_for_dtata_recorded_by_babymind) < 1:
-                        time.sleep(5)
-                        pass
+                # if self.flag_record_data_in_queu_for_analyse != 0 and len(self.queue_for_dtata_recorded_by_babymind)==0:
+                #     while len(self.queue_for_dtata_recorded_by_babymind) < 1:
+                #         time.sleep(5)
+                #         pass
                 with open(file_to_open, "r+b") as file:
                     line = file.read(4)
                     out_hex = ['{:02X}'.format(b) for b in line]
@@ -1602,10 +1415,13 @@ class Canon:
                     nbre_trigger_rate = 0
 
                     gtrig_header = {}
+                    #gtrig_header = dict((i,0) for i in [0, 2])
+
                     global_trigger_header_amplitude = dict((i, []) for i in [0, 2])
                     global_trigger_header_time = dict((i, []) for i in [0, 2])
 
                     gtrig_ampli_or_tot_old = dict((i, 0) for i in [0, 2])
+                    #gtrig_ampli_or_tot_old ={}
 
                     countss = 0
 
@@ -1681,17 +1497,14 @@ class Canon:
                                                         Edge_time = int(line_out_b[16], 2)
                                                     Amplitude_or_tot_measurement = int(line_out_b[20:32], 2)
 
-                                                    if len(
-                                                            pin_complete_slots) == 2:  # if pin_complete_slots == [0, 2]:
+                                                    if len(pin_complete_slots) == 2:  # if pin_complete_slots == [0, 2]:
                                                         write_in_new_file = 1
-                                                        if (gtrig_header[slot] - gtrig_ampli_or_tot_old[
-                                                            slot]) != 0:  # to  verify
-                                                            X1_trigger_rate += 1 / ((gtrig_header[slot] -
-                                                                                     gtrig_ampli_or_tot_old[
-                                                                                         slot]) * 10e-6)
-                                                            X2_trigger_rate += (1 / (
-                                                                    (gtrig_header[slot] - gtrig_ampli_or_tot_old[
-                                                                        slot]) * 10e-6)) ** 2
+                                                        # print("Clés: gtrig header, ampli or tot")
+                                                        # print(gtrig_header)
+                                                        # print(gtrig_ampli_or_tot_old)
+                                                        if (gtrig_header[slot] - gtrig_ampli_or_tot_old[slot]) != 0:  # to  verify
+                                                            X1_trigger_rate += 1 / ((gtrig_header[slot] - gtrig_ampli_or_tot_old[slot]) * 10e-6)
+                                                            X2_trigger_rate += (1 / ((gtrig_header[slot] - gtrig_ampli_or_tot_old[slot]) * 10e-6)) ** 2
                                                             nbre_trigger_rate += 1
                                                             gtrig_ampli_or_tot_old[slot] = gtrig_header[slot]
 
@@ -1781,29 +1594,18 @@ class Canon:
                                                                   dict_queue_edge[
                                                                       (slot, Channel_id, Tag_Id, Hit_Id)][
                                                                       0]
-                                                            if tot >= 0:
-
-                                                                global_trigger_header_amplitude[slot].append(
-                                                                    gtrig_header[slot])
-                                                                global_trigger_header_time[slot].append(
-                                                                    gtrig_header_used_for_rate[
-                                                                        (slot, Channel_id, Tag_Id,
-                                                                         Hit_Id)])
+                                                            if tot >= 0: #testé, on rentre dedans (il faut laisser les old pixels en commentaire sinon ne marche pas)
+                                                                global_trigger_header_amplitude[slot].append(gtrig_header[slot])
+                                                                global_trigger_header_time[slot].append(gtrig_header_used_for_rate[(slot, Channel_id, Tag_Id,Hit_Id)])
 
                                                                 positive_tot += 1
-
-                                                                val_LG=dict_queue_edge[
-                                                                        (slot, Channel_id, Tag_Id,
-                                                                         Hit_Id)][2]
-                                                                val_HG= dict_queue_edge[
-                                                                        (slot, Channel_id, Tag_Id,
-                                                                         Hit_Id)][3]
+                                                                val_LG=dict_queue_edge[(slot, Channel_id, Tag_Id,Hit_Id)][2]
+                                                                val_HG= dict_queue_edge[(slot, Channel_id, Tag_Id,Hit_Id)][3]
 
                                                                 if Channel_id not in aux_dict_to_test_coincidence.keys():
                                                                     aux_dict_to_test_coincidence[Channel_id]=[val_LG]
                                                                 else:
                                                                     aux_dict_to_test_coincidence[Channel_id].append(val_LG)
-
 
                                                                 data_LG[pqr][Channel_id]= val_LG
 
@@ -1812,35 +1614,19 @@ class Canon:
 
 
                                                                 data_time[pqr][Channel_id]=tot
-
                                                                 #fill global histo
-                                                                self.old_dict_pixelid_values_LG_for_histo_global[
-                                                                    keys].fill(val_LG, Channel_id)
-                                                                self.old_dict_pixelid_values_HG_for_histo_global[
-                                                                    keys].fill(val_HG, Channel_id)
-                                                                self.old_dict_pixelid_values_tot_for_histo_global[
-                                                                    keys].fill(tot, Channel_id)
+                                                                # self.old_dict_pixelid_values_LG_for_histo_global[keys].fill(val_LG, Channel_id)
+                                                                # self.old_dict_pixelid_values_HG_for_histo_global[keys].fill(val_HG, Channel_id)
+                                                                # self.old_dict_pixelid_values_tot_for_histo_global[keys].fill(tot, Channel_id)
 
                                                                 #fill local histo
-                                                                self.old_dict_pixelid_values_LG_for_histo_local[
-                                                                    keys].fill(val_LG, Channel_id)
-                                                                self.old_dict_pixelid_values_HG_for_histo_local[
-                                                                    keys].fill(val_HG, Channel_id)
-                                                                self.old_dict_pixelid_values_tot_for_histo_local[
-                                                                    keys].fill(tot, Channel_id)
+                                                                # self.old_dict_pixelid_values_LG_for_histo_local[keys].fill(val_LG, Channel_id)
+                                                                # self.old_dict_pixelid_values_HG_for_histo_local[keys].fill(val_HG, Channel_id)
+                                                                # self.old_dict_pixelid_values_tot_for_histo_local[keys].fill(tot, Channel_id)
 
-                                                                event_data_amplitude_LG[nmo] = [(Channel_id,
-                                                                                                 dict_queue_edge[
-                                                                                                     (slot, Channel_id,
-                                                                                                      Tag_Id,
-                                                                                                      Hit_Id)][2])]
-                                                                event_data_amplitude_HG[nmo] = [(Channel_id,
-                                                                                                 dict_queue_edge[
-                                                                                                     (slot, Channel_id,
-                                                                                                      Tag_Id,
-                                                                                                      Hit_Id)][3])]
-                                                                event_data_tot[nmo] = (Channel_id,
-                                                                                       tot)
+                                                                event_data_amplitude_LG[nmo] = [(Channel_id,dict_queue_edge[(slot, Channel_id,Tag_Id,Hit_Id)][2])]
+                                                                event_data_amplitude_HG[nmo] = [(Channel_id,dict_queue_edge[(slot, Channel_id,Tag_Id,Hit_Id)][3])]
+                                                                event_data_tot[nmo] = (Channel_id,tot)
 
                                                                 if nbre_ampli_and_tot[Channel_id] != 0:
                                                                     rate_aux = 1 / ((gtrig_header_used_for_rate[
@@ -2050,10 +1836,11 @@ class Canon:
             [aux[74] for aux in list_rate_components[0:2]], mean_trigger_rate, std_trigger_rate)
 
         if self.flag_draw_trigger_rate==True:
+
             self.list_mean_cosmicray_rate_HG.append(list_rate_components[0][0])
             self.list_std_cosmicray_rate_HG.append(list_rate_components[1][0])
-            self.list_mean_cosmicray_rate_LG.append(list_rate_components[2][0] )
-            self.list_std_cosmicray_rate_LG.append(list_rate_components[3][0] )
+            self.list_mean_cosmicray_rate_LG.append(list_rate_components[2])
+            self.list_std_cosmicray_rate_LG.append(list_rate_components[3] )
             self.list_mean_cosmicray_rate_tot.append(list_rate_components[4][0] )
             self.list_std_cosmicray_rate_tot.append(list_rate_components[5][0] )
 
@@ -2074,6 +1861,7 @@ class Canon:
         answer = messagebox.askyesnocancel("Draw", "Are You Sure to do this operation?", icon='warning')
 
         if answer:
+
             if (self.fen2 is not None) and self.fen2.winfo_exists():
                 self._close_window_histogramm()
 
@@ -2081,7 +1869,7 @@ class Canon:
                 self.stop_it() # i stop evnt display
 
             if self.flag_draw_trigger_rate == False:
-                folder_result_acquisition_babymind = "D:/resultat_acquisition_babymind/folder_result_acquisition_babymind"
+                folder_result_acquisition_babymind = "/home/mathias/Documents/unige/UNIGE/2eme/appliInfo/script/folder_result_acquisition_babymind/test"
                 for file_object in os.listdir(folder_result_acquisition_babymind):
                     os.remove(os.path.join(folder_result_acquisition_babymind, file_object))
             self.flag_draw_trigger_rate=True
@@ -2105,6 +1893,7 @@ class Canon:
                     print(threshold_aux)
                     self.start_it()
                     self.flag_stop = 0
+
 
             with open(self.file_to_analyze_rate,"wb") as trigger_file:
                 pickle.dump([self.list_mean_cosmicray_rate_HG, self.list_std_cosmicray_rate_HG ,self.list_mean_cosmicray_rate_LG ,self.list_std_cosmicray_rate_LG,self.list_mean_cosmicray_rate_tot,self.list_std_cosmicray_rate_tot,self.list_mean_trigger_rate_ampli,self.list_std_trigger_rate_ampli,self.list_mean_trigger_rate_tot,self.list_std_trigger_rate_tot],trigger_file)
@@ -2175,7 +1964,7 @@ class Canon:
         self.axs_trigger_1 = self.fig_trigger.add_subplot(222)
         self.axs_trigger_2 = self.fig_trigger.add_subplot(223)
         self.axs_trigger_3 = self.fig_trigger.add_subplot(224)
-
+        self.analyse_file_contain_rate_aux()
         print("rate parameters for plot")
         print("threshold_x_shape_in_trigger_plot===",self.threshold_x_shape_in_trigger_plot)
         print("list_mean_cosmicray_rate_HG===",self.list_mean_cosmicray_rate_HG)
@@ -2183,8 +1972,8 @@ class Canon:
         print("list_mean_trigger_rate_ampli===",self.list_mean_trigger_rate_ampli)
         print("list_mean_trigger_rate_tot===",self.list_mean_trigger_rate_tot)
 
-        self.list_std_trigger_rate_ampli=[0 if inst is 0 else np.log(inst) for inst in self.list_std_trigger_rate_ampli]
-        self.list_std_trigger_rate_tot = [0 if inst is 0 else np.log(inst) for inst in self.list_std_trigger_rate_tot]
+        # self.list_std_trigger_rate_ampli=[0 if inst is 0 else np.log(inst) for inst in self.list_std_trigger_rate_ampli]
+        # self.list_std_trigger_rate_tot = [0 if inst is 0 else np.log(inst) for inst in self.list_std_trigger_rate_tot]
 
         self.threshold_x_shape_in_trigger_plot_in_PE_LG=[(threshold_LG - np.mean(self.pedestal_LG))/np.mean(self.Gain_LG) for threshold_LG in self.threshold_x_shape_in_trigger_plot]
         self.threshold_x_shape_in_trigger_plot_in_PE_HG = [
@@ -2196,14 +1985,11 @@ class Canon:
 
         self.axs_trigger_0.errorbar(self.threshold_x_shape_in_trigger_plot,self.list_mean_trigger_rate_ampli,self.list_std_trigger_rate_ampli,fmt='-o')
 
-        self.axs_trigger_1.errorbar(self.threshold_x_shape_in_trigger_plot, self.list_mean_trigger_rate_tot,
-                                    self.list_std_trigger_rate_tot, fmt='-o')
+        self.axs_trigger_1.errorbar(self.threshold_x_shape_in_trigger_plot, self.list_mean_trigger_rate_tot, self.list_std_trigger_rate_tot, fmt='-o')
 
-        self.axs_trigger_2.errorbar(self.threshold_x_shape_in_trigger_plot, self.list_mean_cosmicray_rate_HG,
-                                    self.list_std_cosmicray_rate_HG, fmt='-o')
+        self.axs_trigger_2.errorbar(self.threshold_x_shape_in_trigger_plot, self.list_mean_cosmicray_rate_HG, self.list_std_cosmicray_rate_HG, fmt='-o')
 
-        self.axs_trigger_3.errorbar(self.threshold_x_shape_in_trigger_plot, self.list_mean_cosmicray_rate_tot,
-                                    self.list_std_cosmicray_rate_tot, fmt='-o')
+        self.axs_trigger_3.errorbar(self.threshold_x_shape_in_trigger_plot, self.list_mean_cosmicray_rate_tot, self.list_std_cosmicray_rate_tot, fmt='-o')
 
         self.fig_trigger.tight_layout()
 
@@ -2347,7 +2133,7 @@ class Canon:
 
     def make_mini_cam_mathieu(self, size_edge_to_edge):
         mini_cam_mathieu = {}
-        with open("D:/resultat_acquisition_babymind/fichier_config_mini_camera_mathieu.txt","r") as file:
+        with open("/home/mathias/Documents/unige/UNIGE/2eme/appliInfo/script/folder_result_acquisition_babymind/fichier_config_mini_camera_mathieu.txt","r") as file:
             line = file.readline().split("\n")[0].split("\t")
             while line[0] != "":
                 pixel_id = float(line[0])
@@ -2372,7 +2158,7 @@ class Canon:
         '''
 
         mini_cam_mathieu_with_node = {}
-        with open("D:/resultat_acquisition_babymind/mapping_mini_cam_with_node/MappingTable_MiniCamera.txt","r") as file:
+        with open("/home/mathias/Documents/unige/UNIGE/2eme/appliInfo/script/folder_result_acquisition_babymind/MappingTable_MiniCamera.txt","r") as file:
             line=file.readline()
             line = file.readline().split("\n")[0].split("\t")
             while line[0] != "":
@@ -2390,7 +2176,6 @@ class Canon:
 
 
                 line = file.readline().split("\n")[0].split("\t")
-
         dict_pixels_ids_1 = {117: 0, 84: 1, 116: 2, 113: 3, 111: 4, 86: 5, 85: 6, 90: 7, 119: 8, 112: 9, 110: 10, 129: 11,
                              72: 12, 87: 13, 88: 14, 91: 15, 118: 16, 115: 17, 109: 18, 128: 19, 125: 20, 123: 21,
                              74: 22, 73: 23, 78: 24, 89: 25, 95: 26, 94: 27, 105: 28, 114: 29, 108: 30, 131: 31,
@@ -2407,7 +2192,6 @@ class Canon:
                              15: 136, 24: 137, 25: 138, 28: 139, 29: 140, 33: 141, 26: 142, 27: 143}
         dict_pixels_ids_1=dict((item,key) for (key,item) in dict_pixels_ids_1.items())
         mini_cam_mathieu_with_node=dict((dict_pixels_ids_1[key],item) for (key,item) in mini_cam_mathieu_with_node.items())
-
 
 
 
@@ -2555,7 +2339,7 @@ class Canon:
 
 
     def plot_pixels_grid_bis(self,pixels, data_from_electronics):
-
+        data_from_electronics=data_from_electronics.tolist()
         #cmap1 = cm.YlOrBr
         #norm1 = colors.Normalize(np.min(data_from_electronics), np.max(data_from_electronics))
 
@@ -2567,13 +2351,13 @@ class Canon:
         self.cmap1.set_array([])
 
         for pixel_id,polygones in self.dict_polygones.items():
-            polygones.set_facecolor(self.cmap1.to_rgba(data_from_electronics[int(pixel_id)]))
+            polygones.set_facecolor(self.cmap1.to_rgba(data_from_electronics[int(pixel_id)])) #traduit chaque pixel (polygone) en la course
             self.axes_fen1.add_patch(polygones)
-
+        #plotly.offline.plot(tls.mpl_to_plotly(self.cmap1))
         self.cb_fen1.update_normal(self.cmap1)
         self.cb_fen1.draw_all()
         self.axes_fen1.axis('equal')
-        self.fig_fen1.savefig("D:/resultat_acquisition_babymind/figures/fig_%s"%self.number_figure)
+        #self.fig_fen1.savefig("~/Documents/unige/UNIGE/2eme/appliInfo/interface/resultat_acquisition_babymind/figures/fig_%s"%self.number_figure)
         self.number_figure+=1
         # if you want to draw the center of the pixels
         # draw_pixel_center(list_centers_xs, list_centers_ys)
@@ -2586,8 +2370,7 @@ class Canon:
 
             self._update_box_messages("We are reading temperature of PDP")
             print(self.usb2can.data_temperature)
-            self.plot_pixels_grid_bis(self.reatribute_id_pixels,
-                                                            self.usb2can.data_temperature)
+            self.plot_pixels_grid_bis(self.reatribute_id_pixels,self.usb2can.data_temperature)
             self.fen1.after(3000, self.start_it)
         else:
 
@@ -2595,14 +2378,12 @@ class Canon:
                 self._update_box_messages("We are in HG")
                 self._update_box_messages(self.list_of_pixels_on_events)
                 print(self.data_electronics_HG)
-                self.plot_pixels_grid_bis(self.reatribute_id_pixels,
-                                                                         self.data_electronics_HG)
+                self.plot_pixels_grid_bis(self.reatribute_id_pixels, self.data_electronics_HG)
             elif self.value_hg_or_lg.get() == "LG":
                 self._update_box_messages("We are in LG")
                 self._update_box_messages(self.list_of_pixels_on_events)
                 print(self.data_electronics_LG)
-                self.plot_pixels_grid_bis(self.reatribute_id_pixels,
-                                                                         self.data_electronics_LG)
+                self.plot_pixels_grid_bis(self.reatribute_id_pixels, self.data_electronics_LG)
 
             elif self.value_hg_or_lg.get() == "TOT":
                 self._update_box_messages("We are in TOT")
@@ -2663,692 +2444,21 @@ class Canon:
                             self.list_pixels_triggered.append(pixels_test)
                             break
 
-    def export_data_electronis_values(self):
 
-        if self.entr5.get()=='': #attribute value 0 to entry 5 if it is equal to 0
-            self.entr5.delete(0,END)
-            self.entr5.insert(0,"0")
 
-        self.time_allowed_to_display_events = int(self.entr10.get()) * 1e-3
-        duration=0
-        dict_data_electronics_LG={}
-        dict_data_electronics_HG = {}
-        dict_data_electronics_tot = {}
-        start_time = time.time()
-        self.old_dict_pixelid_values_HG_for_histo_local = dict(
-            (i, Hist1D_local(self.bin_array_HG[i], 0, 5000, i)) for i in np.arange(144))
-        self.old_dict_pixelid_values_LG_for_histo_local = dict(
-            (i, Hist1D_local(self.bin_array_LG[i], 0, 5000, i)) for i in np.arange(144))
-        self.old_dict_pixelid_values_tot_for_histo_local = dict(
-            (i, Hist1D_local(self.bin_array_tot[i], 0, 5000, i)) for i in np.arange(144))
-
-        while duration < self.time_allowed_to_display_events:
-
-            where = self.new_file1.tell()
-            try:
-                line = pickle.load(self.new_file1)
-                #print(line)
-                if line=="END":
-                    while self.flag_can_stop_all==0:
-                        time.sleep(2)
-
-                    print("End of the new file")
-                    print("Event display is finish")
-                    stop_test = time.time()
-                    print('my test duration in step 3====', stop_test - self.start_test)
-                    print('my test duration in step glopbal (duration since begining until end of display)====', stop_test - self.start_test_global)
-                    self.stop_it()
-                    break
-            except EOFError:
-                line=0
-                pass
-
-            if line==0:
-                time.sleep(1)
-                self.new_file1.seek(where)
-            else:
-                #print("succes read new file")
-                #print(line)
-                if line[0]=="Amplitude":
-                    event_data_amplitude_LG=line[1]
-                    event_data_amplitude_HG=line[2]
-                    #print(line[0])
-                    if event_data_amplitude_LG != {}:
-
-                        list_tuples_LG = [var[0] for var in list(event_data_amplitude_LG.values())]
-                        dict_pixelid_values_LG = {}
-                        for (x, y) in enumerate(list_tuples_LG):
-
-                            if y[0] not in dict_pixelid_values_LG.keys():
-                                dict_pixelid_values_LG[y[0]] = [y[1]]
-
-                            else:
-                                dict_pixelid_values_LG[y[0]].append(y[1])
-
-                        # the local and global histogram will be performing here
-                        for keys, data in dict_pixelid_values_LG.items():
-                            self.old_dict_pixelid_values_LG_for_histo_global[keys].fill(data, keys)
-                            self.old_dict_pixelid_values_LG_for_histo_local[keys].fill(data, keys)
-
-                        # data_electronics_LG = np.array([random.randint(0, self.threshold_DAC) for r in range(144)])
-                        data_electronics_LG = np.zeros(144)
-
-                        if self.box_choice.get()=="DAC": #test if i want to display events in the DAc mode
-
-                            dict_pixelid_values_LG = {keys: np.max(dict_pixelid_values_LG[keys]) for keys in
-                                                      dict_pixelid_values_LG.keys()}
-                            # print(dict_pixelid_values_LG)
-
-                            self.trigger_sofware_in_pixel_configuration(dict_pixelid_values_LG) #test trigger pixels configuration
-
-
-                            #sum_to_have_more_event_ligthed_LG = np.sum(list(dict_pixelid_values_LG.values()))
-                            sum_to_have_more_event_ligthed_LG = np.sum([dict_pixelid_values_LG[item] for item in
-                                                                           self.list_pixels_triggered])
-
-
-                            if sum_to_have_more_event_ligthed_LG >= int(self.entr5.get()): #test trigger pixels sum values
-
-                                # data_electronics_LG[list(dict_pixelid_values_LG.keys())] = list(dict_pixelid_values_LG.values())
-                                data_electronics_LG[self.list_pixels_triggered] = [dict_pixelid_values_LG[item] for item in
-                                                                               self.list_pixels_triggered]
-
-                                dict_data_electronics_LG[sum_to_have_more_event_ligthed_LG] = data_electronics_LG
-
-
-                        elif self.box_choice.get()=="PE":
-
-                            dict_pixelid_values_LG = {keys: ((np.max(dict_pixelid_values_LG[keys]) \
-                                                              - self.pedestal_LG[keys])/self.Gain_LG[keys]) for keys in
-                                                      dict_pixelid_values_LG.keys() if \
-                                                      np.max(dict_pixelid_values_LG[keys])>=self.pedestal_LG[keys]}
-                            # print(dict_pixelid_values_LG)
-
-                            self.trigger_sofware_in_pixel_configuration(
-                                dict_pixelid_values_LG)  # test trigger pixels configuration
-
-                            # sum_to_have_more_event_ligthed_LG = np.sum(list(dict_pixelid_values_LG.values()))
-                            sum_to_have_more_event_ligthed_LG = np.sum([dict_pixelid_values_LG[item] for item in
-                                                                        self.list_pixels_triggered])
-
-                            if sum_to_have_more_event_ligthed_LG >= int(self.entr5.get()):  # test trigger pixels sum values
-
-                                # data_electronics_LG[list(dict_pixelid_values_LG.keys())] = list(dict_pixelid_values_LG.values())
-                                data_electronics_LG[self.list_pixels_triggered] = [dict_pixelid_values_LG[item] for \
-                                                                                   item in self.list_pixels_triggered]
-
-                                dict_data_electronics_LG[sum_to_have_more_event_ligthed_LG] = data_electronics_LG
-
-                    if event_data_amplitude_HG != {}:
-                        #print(list_tuples_HG)
-                        list_tuples_HG = [var[0] for var in list(event_data_amplitude_HG.values())]
-                        dict_pixelid_values_HG = {}
-                        for (x, y) in enumerate(list_tuples_HG):
-
-                            if y[0] not in dict_pixelid_values_HG.keys():
-                                dict_pixelid_values_HG[y[0]] = [y[1]]
-
-                            else:
-                                dict_pixelid_values_HG[y[0]].append(y[1])
-
-                        # the local and global histogram will be performing here
-                        for keys, data in dict_pixelid_values_HG.items():
-                            self.old_dict_pixelid_values_HG_for_histo_global[keys].fill(data, keys)
-                            self.old_dict_pixelid_values_HG_for_histo_local[keys].fill(data, keys)
-
-                        # data_electronics_HG = np.array([random.randint(0, self.threshold_DAC) for r in range(144)])
-                        data_electronics_HG = np.zeros(144)
-
-                        if self.box_choice.get()=="DAC": #test if i want to display events in the DAc mode
-
-                            dict_pixelid_values_HG = {keys: np.max(dict_pixelid_values_HG[keys]) for keys in
-                                                      dict_pixelid_values_HG.keys()}
-                            # print(dict_pixelid_values_HG)
-
-                            self.trigger_sofware_in_pixel_configuration(dict_pixelid_values_HG) #test trigger pixels configuration
-
-
-                            #sum_to_have_more_event_ligthed_HG = np.sum(list(dict_pixelid_values_HG.values()))
-                            sum_to_have_more_event_ligthed_HG = np.sum([dict_pixelid_values_HG[item] for item in
-                                                                           self.list_pixels_triggered])
-
-
-                            if sum_to_have_more_event_ligthed_HG >= int(self.entr5.get()): #test trigger pixels sum values
-
-                                # data_electronics_HG[list(dict_pixelid_values_HG.keys())] = list(dict_pixelid_values_HG.values())
-                                data_electronics_HG[self.list_pixels_triggered] = [dict_pixelid_values_HG[item] for item in
-                                                                               self.list_pixels_triggered]
-
-                                dict_data_electronics_HG[sum_to_have_more_event_ligthed_HG] = data_electronics_HG
-
-
-                        elif self.box_choice.get()=="PE":
-
-                            dict_pixelid_values_HG = {keys: ((np.max(dict_pixelid_values_HG[keys]) \
-                                                              - self.pedestal_HG[keys])/self.Gain_HG[keys]) for keys in
-                                                      dict_pixelid_values_HG.keys() if \
-                                                      np.max(dict_pixelid_values_HG[keys])>=self.pedestal_HG[keys]}
-                            # print(dict_pixelid_values_HG)
-
-                            self.trigger_sofware_in_pixel_configuration(
-                                dict_pixelid_values_HG)  # test trigger pixels configuration
-
-                            # sum_to_have_more_event_ligthed_HG = np.sum(list(dict_pixelid_values_HG.values()))
-                            sum_to_have_more_event_ligthed_HG = np.sum([dict_pixelid_values_HG[item] for item in
-                                                                        self.list_pixels_triggered])
-
-                            if sum_to_have_more_event_ligthed_HG >= int(self.entr5.get()):  # test trigger pixels sum values
-                                #print("self.entr5", self.entr5.get())
-                                # data_electronics_HG[list(dict_pixelid_values_HG.keys())] = list(dict_pixelid_values_HG.values())
-                                data_electronics_HG[self.list_pixels_triggered] = [dict_pixelid_values_HG[item] for \
-                                                                                   item in self.list_pixels_triggered]
-
-                                dict_data_electronics_HG[sum_to_have_more_event_ligthed_HG] = data_electronics_HG
-
-                elif line[0]=="tot":
-                    event_data_tot=line[1]
-                    if event_data_tot != {}:
-
-                        list_tuples_tot = [var[0] for var in list(event_data_tot.values())]
-                        dict_pixelid_values_tot = {}
-                        for (x, y) in enumerate(list_tuples_tot):
-
-                            if y[0] not in dict_pixelid_values_tot.keys():
-                                dict_pixelid_values_tot[y[0]] = [y[1]]
-
-                            else:
-                                dict_pixelid_values_tot[y[0]].append(y[1])
-
-                        # the local and global histogram will be performing here
-                        for keys, data in dict_pixelid_values_tot.items():
-                            self.old_dict_pixelid_values_tot_for_histo_global[keys].fill(data, keys)
-                            self.old_dict_pixelid_values_tot_for_histo_local[keys].fill(data, keys)
-
-                        # data_electronics_tot = np.array([random.randint(0, self.threshold_DAC) for r in range(144)])
-                        data_electronics_tot = np.zeros(144)
-
-                        if self.box_choice.get()=="DAC": #test if i want to display events in the DAc mode
-
-                            dict_pixelid_values_tot = {keys: np.max(dict_pixelid_values_tot[keys]) for keys in
-                                                      dict_pixelid_values_tot.keys()}
-                            # print(dict_pixelid_values_tot)
-
-                            self.trigger_sofware_in_pixel_configuration(dict_pixelid_values_tot) #test trigger pixels configuration
-
-
-                            #sum_to_have_more_event_ligthed_tot = np.sum(list(dict_pixelid_values_tot.values()))
-                            sum_to_have_more_event_ligthed_tot = np.sum([dict_pixelid_values_tot[item] for item in
-                                                                           self.list_pixels_triggered])
-
-
-                            if sum_to_have_more_event_ligthed_tot >= int(self.entr5.get()): #test trigger pixels sum values
-
-                                # data_electronics_tot[list(dict_pixelid_values_tot.keys())] = list(dict_pixelid_values_tot.values())
-                                data_electronics_tot[self.list_pixels_triggered] = [dict_pixelid_values_tot[item] for item in
-                                                                               self.list_pixels_triggered]
-
-                                dict_data_electronics_tot[sum_to_have_more_event_ligthed_tot] = data_electronics_tot
-
-
-                        elif self.box_choice.get()=="PE":
-
-                            dict_pixelid_values_tot = {keys: ((np.max(dict_pixelid_values_tot[keys]) \
-                                                              - self.pedestal_tot[keys])/self.Gain_tot[keys]) for keys in
-                                                      dict_pixelid_values_tot.keys() if \
-                                                      np.max(dict_pixelid_values_tot[keys])>=self.pedestal_tot[keys]}
-                            # print(dict_pixelid_values_tot)
-
-                            self.trigger_sofware_in_pixel_configuration(
-                                dict_pixelid_values_tot)  # test trigger pixels configuration
-
-                            # sum_to_have_more_event_ligthed_tot = np.sum(list(dict_pixelid_values_tot.values()))
-                            sum_to_have_more_event_ligthed_tot = np.sum([dict_pixelid_values_tot[item] for item in
-                                                                        self.list_pixels_triggered])
-
-                            if sum_to_have_more_event_ligthed_tot >= int(self.entr5.get()):  # test trigger pixels sum values
-                                #print("self.entr5", self.entr5.get())
-                                # data_electronics_tot[list(dict_pixelid_values_tot.keys())] = list(dict_pixelid_values_tot.values())
-                                data_electronics_tot[self.list_pixels_triggered] = [dict_pixelid_values_tot[item] for \
-                                                                                   item in self.list_pixels_triggered]
-
-                                dict_data_electronics_tot[sum_to_have_more_event_ligthed_tot] = data_electronics_tot
-
-            #stop_time = time.time()
-            duration = time.time() - start_time
-            start_time=time.time()
-
-        #print(dict_data_electronics_LG)
-        if dict_data_electronics_LG=={}:
-            #self.data_electronics_LG = np.array([random.randint(0, self.threshold_DAC) for r in range(144)])
-            self.data_electronics_LG = np.array([random.randint(0, 0) for r in range(144)])
-            dict_pixelid_values_LG={}
-        else:
-            self.data_electronics_LG = dict_data_electronics_LG[np.max(list(dict_data_electronics_LG.keys()))]
-            #self.data_electronics_LG = dict_data_electronics_LG[random.choice(list(dict_data_electronics_LG.keys()))]
-
-        if dict_data_electronics_HG=={}:
-            #self.data_electronics_HG = np.array([random.randint(0, self.threshold_DAC) for r in range(144)])
-            self.data_electronics_HG = np.array([random.randint(0, 0) for r in range(144)])
-            dict_pixelid_values_HG={}
-        else:
-            self.data_electronics_HG = dict_data_electronics_HG[np.max(list(dict_data_electronics_HG.keys()))]
-             #self.data_electronics_HG = dict_data_electronics_HG[random.choice(list(dict_data_electronics_HG.keys()))]
-
-        if dict_data_electronics_tot=={}:
-            #self.data_electronics_tot = np.array([random.randint(0, self.threshold_DAC) for r in range(144)])
-            self.data_electronics_tot = np.array([random.randint(0, 0) for r in range(144)])
-            dict_pixelid_values_tot={}
-        else:
-            self.data_electronics_tot = dict_data_electronics_tot[np.max(list(dict_data_electronics_tot.keys()))]
-             #self.data_electronics_tot = dict_data_electronics_tot[random.choice(list(dict_data_electronics_tot.keys()))]
-
-        #print(self.old_dict_pixelid_values_HG_for_histo_local)
-        #print(self.old_dict_pixelid_values_LG_for_histo_local)
-        # print(self.old_dict_pixelid_values_tot_for_histo_local)
-        self.list_of_pixels_on_events_LG=list(dict_pixelid_values_LG.keys())
-        self.list_of_pixels_on_events_HG = list(dict_pixelid_values_HG.keys())
-        self.list_of_pixels_on_events_tot = list(dict_pixelid_values_tot.keys())
-        #plt.close(self.fig)
-        self.plots_hex_in_canvas_pdp()
-        self.fen1.update_idletasks()
-
-        if self.flag_active_draw_button_for_histo_parent==0:
-
-            self.b7.config(state="active")  # enable the draw histogram button
-            self.flag_active_draw_button_for_histo_parent = 1 #This flag is to know if i can have data to draw it in histogramm
-
-
-        if self.flag_1 == 1:
-            print("cycle")
-            self.flag_start = 0
-
-            if (self.fen2 is not None) and self.fen2.winfo_exists():  # condition to test if child fen2 window is open or not
-                #print(self.fen2.wm_state())   # this is to print the status of child fen 2 only if fen2 is open
-                #animation.FuncAnimation(self.canvas, self.export_data_electronis_values(), interval=5000)
-
-                #self.th2 = threading.Thread(target=self._trace_histo_pixel_draw_and_plot()).start() #this is to start at same time two functions
-                #self.th1 = threading.Thread(target=self.fen1.after(5000, self.start_it())).start()  #this is to start at same time two functions
-
-                #mp2 = multiprocessing.Process(target=self._trace_histo_pixel_draw_and_plot(),args=(...)).start()  #this is to start at same time two functions
-                #mp1 = multiprocessing.Process(target=self.fen1.after(5000, self.start_it()),args=(...)).start()   #this is to start at same time two functions
-
-                self.th2 = threading.Thread(target=self._trace_histo_pixel_draw_and_plot()).start()  # this is to start at same time two functions
-
-            #else :
-            self.fen1.after(5000, self.start_it)
-
-class get_data_from_usb2can_ixxat():
-
-    #def __init__(self,power_supply):
-    def __init__(self):
-
-        #self.power_supply=power_supply
-
-        self.CRED = '\033[91m'
-        self.CGREEN  = '\33[32m'
-        self.CVIOLET = '\33[35m'
-        self.CEND = '\033[0m'
-        self.flag_connect_usb2can=0
-        self.flag_HV_ON = 0
-        self.time_out=1  #In seconds
-        self.critical_temperature=43
-        self.critical_HV = 80
-
-        '''
-        self.dict_arbitrationId_contains_modules_and_pixelsId = {
-            0x602: [[2], [98, 99, 112, 113, 87, 88, 100, 101, 76, 89, 90, 102]],
-            0x603: [[7], [124, 125, 135, 136, 114, 115, 126, 127, 103, 116, 117, 128]],
-            0x604: [[8], [137, 138, 142, 143, 131, 132, 139, 140, 123, 133, 134, 141]],
-            0x605: [[9], [118, 119, 129, 130, 108, 109, 120, 121, 97, 110, 111, 122]],
-            0x606: [[3], [39, 50, 49, 61, 51, 63, 62, 73, 75, 74, 86, 85]],
-            0x607: [[10], [60, 71, 70, 82, 72, 84, 83, 94, 96, 95, 107, 106]],
-            0x608: [[11], [12, 23, 22, 34, 24, 36, 35, 46, 48, 47, 59, 58]],
-            0x609: [[12], [1, 6, 5, 13, 7, 15, 14, 25, 27, 26, 38, 37]],
-            0x60A: [[1], [78, 66, 54, 42, 77, 65, 53, 41, 64, 52, 40, 28]],
-            0x60B: [[4], [30, 18, 10, 4, 29, 17, 9, 3, 16, 8, 2, 0]],
-            0x60C: [[5], [57, 45, 33, 21, 56, 44, 32, 20, 43, 31, 19, 11]],
-            0x60D: [[6], [105, 93, 81, 69, 104, 92, 80, 68, 91, 79, 67, 55]]}
-        '''
-
-        self.dict_arbitrationId_contains_modules_and_pixelsId = {
-            0x602: [[2], [0, 1, 2, 3, 6, 7, 4, 5, 10, 11, 8, 9]],
-            0x603: [[7], [12, 13, 14, 15, 18, 19, 16, 17, 22, 23, 20, 21]],
-            0x604: [[8], [24, 25, 26, 27, 30, 31, 28, 29, 34, 35, 32, 33]],
-            0x605: [[9], [36, 37, 38, 39, 42, 43, 40, 41, 46, 47, 44, 45]],
-            0x606: [[3], [48, 49, 50, 51, 54, 55, 52, 53, 58, 59, 56, 57]],
-            0x607: [[10], [60, 61, 62, 63, 66, 67, 64, 65, 70, 71, 68, 69]],
-            0x608: [[11], [72, 73, 74, 75, 78, 79, 76, 77, 82, 83, 80, 81]],
-            0x609: [[12], [84, 85, 86, 87, 90, 91, 88, 89, 94, 95, 92, 93]],
-            0x60A: [[1], [96, 97, 98, 99, 102, 103, 100, 101, 106, 107, 104, 105]],
-            0x60B: [[4], [108, 109, 110, 111, 114, 115, 112, 113, 118, 119, 116, 117]],
-            0x60C: [[5], [120, 121, 122, 123, 126, 127, 124, 125, 130, 131, 128, 129]],
-            0x60D: [[6], [132, 133, 134, 135, 138, 139, 136, 137, 142, 143, 140, 141]]}
-
-
-
-    def connect_interface_usb2can_Ixxat(self):
-        if self.flag_connect_usb2can==0:
-            self.flag_connect_usb2can += 1
-            self.bus = can.interface.Bus(bustype='ixxat', channel=0, bitrate=181000)
-            print(self.CGREEN + "Usb2can Ixxat has been connected with success" + self.CEND)
-            self.jump_to_application_usb2can()
-        else:
-            print(self.CGREEN + "Usb2can Ixxat already connected" + self.CEND)
-        self.empty_the_fifo()
-
-    def shutdown_interface_usb2can_Ixxat(self):
-
-        if self.flag_HV_ON==1:
-            self.set_HV_OFF_PDP()
-        else:
-            print(self.CVIOLET + "The HV of the PDP has never been ON"+ self.CEND)
-
-        if self.flag_connect_usb2can == 1:
-            self.flag_connect_usb2can = 0
-            self.bus.shutdown()
-            print(self.CVIOLET + '\33[35m' + "Usb2can Ixxat has been shutdown properly" + self.CEND)
-        else:
-            print(self.CVIOLET + '\33[35m' + "Usb2can Ixxat is already deconnected" + self.CEND)
-
-        self.empty_the_fifo()
-
-    def empty_the_fifo(self):
-
-        try:
-            self.rx=str(self.bus.recv(self.time_out))
-            while self.rx!="None":
-                self.rx = str(self.bus.recv(self.time_out))
-        except:
-            pass
-        print(self.CVIOLET + "The fifo is empty" + self.CEND)
-        print(self.rx)
-
-    def jump_to_application_usb2can(self):
-        for can_node in self.dict_arbitrationId_contains_modules_and_pixelsId.keys():
-            msg=can.Message(arbitration_id=can_node,data=[0x1F,0x05],extended_id=False)
-            self.bus.send(msg)
-            time.sleep(0.5)
-            self.rx=str(self.bus.recv(self.time_out))
-            if self.rx=="None":
-                print(self.CGREEN+ "Jump to application in module %s"%self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][0][0] + self.CEND)
-            else:
-                print(self.rx)
-                print(self.CRED+ "Jump to application failed in module %s"%self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][0][0] + self.CEND)
-                #raise IOError ("Jump to application failed")
-        self.empty_the_fifo()
-
-    def set_HV_ON_PDP(self):
-
-        self.flag_HV_ON += 1
-
-        for can_node in self.dict_arbitrationId_contains_modules_and_pixelsId.keys():
-            msg = can.Message(arbitration_id=can_node, data=[0x07, 0x8F, 0xFF], extended_id=False)
-            self.bus.send(msg)
-            time.sleep(0.5)
-        self.empty_the_fifo()
-        print(self.CGREEN + "The HV of the PDP is ON" + self.CEND)
-
-    def set_HV_OFF_PDP(self):
-
-        self.flag_HV_ON = 0
-        for can_node in self.dict_arbitrationId_contains_modules_and_pixelsId.keys():
-            msg = can.Message(arbitration_id=can_node, data=[0x07, 0x80, 0x00], extended_id=False)
-            self.bus.send(msg)
-            time.sleep(0.5)
-        self.empty_the_fifo()
-        print(self.CVIOLET + "The HV of the PDP is going OFF properly"+ self.CEND)
-
-    def get_HV_PDP(self):
-
-        self.data_HV = [0] * 144
-        for can_node in self.dict_arbitrationId_contains_modules_and_pixelsId.keys():
-            msg = can.Message(arbitration_id=can_node, data=[0x01, 0x04], extended_id=False)
-            self.bus.send(msg)
-            for patch in range(4):
-                self.rx = str(self.bus.recv(self.time_out)).split()
-                dlc = int(self.rx[6])
-                if dlc!=1:
-                    print(self.rx)
-                flag_patch = int(self.rx[7])
-                HV_0 = (int(self.rx[8] + self.rx[9], 16)* 1.67375e-3)
-                HV_1 = (int(self.rx[10] + self.rx[11], 16)* 1.67375e-3)
-                HV_2 = (int(self.rx[12] + self.rx[13], 16) * 1.67375e-3)
-                if flag_patch == 1:
-                    self.data_HV[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][0]] = HV_0
-                    self.data_HV[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][1]] = HV_1
-                    self.data_HV[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][2]] = HV_2
-                if flag_patch == 21:
-                    self.data_HV[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][3]] = HV_0
-                    self.data_HV[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][4]] = HV_1
-                    self.data_HV[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][5]] = HV_2
-                if flag_patch == 41:
-                    self.data_HV[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][6]] = HV_0
-                    self.data_HV[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][7]] = HV_1
-                    self.data_HV[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][8]] = HV_2
-                if flag_patch == 61:
-                    self.data_HV[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][9]] = HV_0
-                    self.data_HV[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][10]] = HV_1
-                    self.data_HV[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][11]] = HV_2
-
-        test_HV_critical_or_negative_values = [temp for temp in self.data_HV if temp>=self.critical_HV or temp < 0]
-        if test_HV_critical_or_negative_values == []:
-            print(self.data_HV)
-            print(self.CVIOLET + "Get HV's PDP properly" + self.CEND)
-            print("THe maximum HV in PDP is %s" % np.max(self.data_HV))
-        else:
-            self.shutdown_interface_usb2can_Ixxat()
-            print(test_HV_critical_or_negative_values)
-            print(self.data_HV)
-            nbre = 0
-            while nbre <= 8:
-                print(self.CRED + "HV has reached critical value or is negative" + self.CEND)
-                nbre += 1
-            #raise IOError("HV has reached critical value or is negative")
-
-
-
-        self.empty_the_fifo()
-
-    def get_temperature_PDP(self):
-
-        self.data_temperature = [0] * 144
-        for can_node in self.dict_arbitrationId_contains_modules_and_pixelsId.keys():
-            msg = can.Message(arbitration_id=can_node, data=[0x01, 0x00], extended_id=False)
-            self.bus.send(msg)
-            #time.sleep(1)
-            for patch in range(4):
-                self.rx = self.bus.recv(self.time_out)
-                self.rx=str(self.rx).split()
-                dlc = int(self.rx[6])
-                if dlc!=7:
-                    print(self.rx)
-                    print(self.usb2can.flag_connect_usb2can , self.usb2can.flag_HV_ON)
-                    # power_supply.Communicate('INST OUT1\n')
-                    # power_supply.Communicate('OUTP OFF\n')
-                    # power_supply.Communicate('INST OUT2\n')
-                    # power_supply.Communicate('OUTP OFF\n')
-                    # power_supply.Communicate('INST OUT3\n')
-                    # power_supply.Communicate('OUTP OFF\n')
-                    # power_supply.Communicate('INST OUT1\n')
-                    # power_supply.Communicate('OUTP ON\n')
-                    # power_supply.Communicate('INST OUT2\n')
-                    # power_supply.Communicate('OUTP ON\n')
-                    # power_supply.Communicate('INST OUT3\n')
-                    # power_supply.Communicate('OUTP ON\n')
-                    time.sleep(1)
-                    self.flag_connect_usb2can = 0
-                    self.flag_HV_ON = 0
-                    self.connect_interface_usb2can_Ixxat()
-                    time.sleep(1)
-                    self.set_HV_ON_PDP()
-                    time.sleep(1)
-                    self.get_temperature_PDP()
-
-                flag_patch = int(self.rx[7])
-                temperature_0 = (int(self.rx[8] + self.rx[9], 16) - 272.93) / 5.97403
-                temperature_1 = (int(self.rx[10] + self.rx[11], 16) - 272.93) / 5.97403
-                temperature_2 = (int(self.rx[12] + self.rx[13], 16) - 272.93) / 5.97403
-                if flag_patch==1:
-                    self.data_temperature[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][0]] = temperature_0
-                    self.data_temperature[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][1]] = temperature_1
-                    self.data_temperature[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][2]] = temperature_2
-                if flag_patch==21:
-                    self.data_temperature[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][3]] = temperature_0
-                    self.data_temperature[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][4]] = temperature_1
-                    self.data_temperature[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][5]] = temperature_2
-                if flag_patch==41:
-                    self.data_temperature[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][6]] = temperature_0
-                    self.data_temperature[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][7]] = temperature_1
-                    self.data_temperature[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][8]] = temperature_2
-                if flag_patch==61:
-                    self.data_temperature[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][9]] = temperature_0
-                    self.data_temperature[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][10]] = temperature_1
-                    self.data_temperature[
-                        self.dict_arbitrationId_contains_modules_and_pixelsId[can_node][1][11]] = temperature_2
-
-        test_temprature_critical_or_negative_values=[temp for temp in self.data_temperature if temp>=self.critical_temperature or temp<0]
-        if test_temprature_critical_or_negative_values==[]:
-            print(self.CVIOLET+ "We Get temperature's PDP properly" +self.CEND)
-            print(self.CVIOLET+"THe maximum temperature in PDP is %s" %np.max(self.data_temperature) +self.CEND)
-            #print(self.flag_connect_usb2can)
-        else:
-            self.shutdown_interface_usb2can_Ixxat()
-            print(test_temprature_critical_or_negative_values)
-            print(self.data_temperature)
-            nbre=0
-            while nbre<=8:
-                print(self.CRED+ "Temperature has reached critical value or is negative. \n Please switch off the power supply of the slow control" + self.CEND)
-                nbre+=1
-            #raise IOError ("Temperature has reached critical value or is negative")
-
-            #'''
-            # power_supply.Communicate('INST OUT1\n')
-            # power_supply.Communicate('OUTP OFF\n')
-            # power_supply.Communicate('INST OUT2\n')
-            # power_supply.Communicate('OUTP OFF\n')
-            # power_supply.Communicate('INST OUT3\n')
-            # power_supply.Communicate('OUTP OFF\n')
-
-            time.sleep(1200)
-
-            # power_supply.Communicate('INST OUT1\n')
-            # power_supply.Communicate('OUTP ON\n')
-            # power_supply.Communicate('INST OUT2\n')
-            # power_supply.Communicate('OUTP ON\n')
-            # power_supply.Communicate('INST OUT3\n')
-            # power_supply.Communicate('OUTP ON\n')
-            self.flag_connect_usb2can = 0
-            self.flag_HV_ON = 0
-            time.sleep(1)
-            self.connect_interface_usb2can_Ixxat()
-            time.sleep(1)
-            self.set_HV_ON_PDP()
-            time.sleep(1)
-            self.get_temperature_PDP()
-            #'''
-
-
-        self.empty_the_fifo()
-
-
-class Communication_with_babymind_via_socket_server(object):
-    def __init__(self):
-        self.connect_socket_server_on_or_off = 0 #initrialise flag to specify that i am not cobnnected to the scocket server
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_address = ("129.194.53.160", 11000)
-        print(sys.stderr, ('connecting to %s port %s' % self.server_address))
-
-    def Connect(self):
-        if self.connect_socket_server_on_or_off==0:
-            self.sock.connect(self.server_address)
-            self.connect_socket_server_on_or_off+=1
-
-    def Communicate(self, string):
-        print(string)
-        #print(('%s\r,"utf-8"')%string)
-        # socket.send(bytes('BoardLib.OpenConfigFile("C:/BabyMindFrontEnd-v1.0.1.614/config/HexSiPM_07_02_2018.xml")\r', "utf-8"))
-        self.sock.send(bytes(string,"utf-8"))  # Send command
-        time.sleep(0.5)  # wait for one second
-        self.message_receive_from_babymind=self.sock.recv(1024).decode()
-        print(self.message_receive_from_babymind)  # Wait for reply
-
-    def deconnect(self):
-        if self.connect_socket_server_on_or_off == 1:
-            self.connect_socket_server_on_or_off = 0
-            self.sock.close()
-            print("Socket server has been closed")
-        else:
-            print("Socket server is already deconnected")
-
-
-
-class Communication_with_power_supply(object):
-    def __init__(self):
-        self.dev = usb.core.find(idVendor=0x403, idProduct=0xED72)
-        self.dev.set_configuration()
-        self.cfg = self.dev.get_active_configuration()
-        self.intf = self.cfg[(0, 0)]
-
-        self.ep = usb.util.find_descriptor(
-            self.intf,
-            # match the first OUT endpoint
-            custom_match= \
-                lambda e: \
-                    usb.util.endpoint_direction(e.bEndpointAddress) == \
-                    usb.util.ENDPOINT_OUT)
-        assert self.ep is not None
-
-
-    def Communicate(self, string):
-
-        '''
-        :param string:
-            -'Opall 0\n' # set all the output Off. Can also use 1 for on
-
-        :return:
-        '''
-        print(string)
-        self.ep.write(bytes(string, "utf-8"))  # Send command
-        time.sleep(0.5)  # wait for one second
-
-class Application:#Frame):
+class Application:  # Frame):
     '''Fenêtre principale de l'application'''
+
     # def __init__(self,fen1,comm,usb2can,power_supply):
-    def __init__(self, fen1, comm, usb2can):
-        #Frame.__init__(self)
-        #self.master.title("Events on the mini camera""Events on the mini camera")
-        #self.pack()
-        self.fen1=fen1
-        self.fen1.wm_title("Events on the mini camera")
+    def __init__(self, fen1):
+        # Frame.__init__(self)
+        # self.master.title("Events on the mini camera""Events on the mini camera")
+        # self.pack()
+        self.fen1 = fen1
+        # self.fen1.wm_title("Events on the mini camera")
+        self.fen1.wm_title("Bravo mathias tu comprends quelque chose !")
 
         self.flag_start = 0
-
-        self.comm=comm
-
-        self.usb2can=usb2can
 
         # self.power_supply=power_supply
 
@@ -3359,12 +2469,12 @@ class Application:#Frame):
         self.var_threshold_DAC.set("540")
         self.entr1 = Spinbox(self.fen1, from_=0, to=1023, textvariable=self.var_threshold_DAC)
         self.entr1.grid(row=2, column=2)
-        #self.threshold_DAC = int(self.entr1.get())
+        # self.threshold_DAC = int(self.entr1.get())
 
         self.txt16 = Label(self.fen1, text='Threshold\nHG :')
         self.txt16.grid(row=1, column=1, sticky='NSEW')
         self.var_threshold_HG = StringVar(self.fen1)
-        self.var_threshold_HG.set("781")
+        self.var_threshold_HG.set("550")
         self.entr14 = Spinbox(self.fen1, from_=0, to=4095, textvariable=self.var_threshold_HG)
         self.entr14.grid(row=1, column=2)
         self.threshold_HG = int(self.entr14.get())
@@ -3372,23 +2482,13 @@ class Application:#Frame):
         self.txt17 = Label(self.fen1, text='Threshold\nLG :')
         self.txt17.grid(row=1, column=3, sticky='NSEW')
         self.var_threshold_LG = StringVar(self.fen1)
-        self.var_threshold_LG.set("131")
+        self.var_threshold_LG.set("1000")
         self.entr15 = Spinbox(self.fen1, from_=0, to=4095, textvariable=self.var_threshold_LG)
         self.entr15.grid(row=1, column=4)
         self.threshold_LG = int(self.entr15.get())
 
-        """
-        if self.flag_start==0:
-            self.data_electronics_LG=np.array([random.randint(120, 120+self.threshold_DAC) for r in range(144)])
-            self.data_electronics_HG = np.array([random.randint(930, 930+self.threshold_DAC) for r in range(144)])
-            self.list_of_pixels_on_events_LG=[None]
-            self.list_of_pixels_on_events_HG=[None]
-        """
-
-
-        # this is to plot the initial PDP with random vaues between 0 and threshold
-        self.init_PDP = Canon(self.fen1, self.flag_start, self.comm, self.usb2can, self.entr1, self.var_threshold_DAC,
-                              self.entr14, self.var_threshold_HG, self.entr15, self.var_threshold_LG)
+        self.init_PDP = Canon(self.fen1, self.flag_start, self.entr1, self.var_threshold_DAC,
+            self.entr14, self.var_threshold_HG, self.entr15, self.var_threshold_LG)
 
 
 
@@ -3545,35 +2645,15 @@ if __name__ =='__main__':
             child_pid = os.getpid() # get children pid of parent pid pycharm
             if type(child_pid) is list:
                 for child in child_pid:
-                    subprocess.call(['taskkill', '/F', '/T', '/PID', str(child)])
+                    subprocess.call(['taskill', '/F', '/T', '/PID', str(child)])
             else:
                 #os.system('kill -TERM -P {pid}'.format(pid=parent_pid))
-                subprocess.call(['taskkill', '/F', '/T', '/PID', str(child_pid)])
+                subprocess.call(['taskill', '/F', '/T', '/PID', str(child_pid)])
             sys.exit(1)
 
     fen1 = Tk()
 
-    # power_supply = Communication_with_power_supply()
-    # power_supply.Communicate('INST OUT1\n')
-    # power_supply.Communicate('VOLT 24\n')
-    # power_supply.Communicate('CURR 4\n')
-    # power_supply.Communicate('INST OUT2\n')
-    # power_supply.Communicate('VOLT 24\n')
-    # power_supply.Communicate('CURR 2.6\n')
-    # power_supply.Communicate('INST OUT3\n')
-    # power_supply.Communicate('VOLT 24\n')
-    # power_supply.Communicate('CURR 1.6\n')
+    fen1.protocol("WM_DELETE_WINDOW", kill)  # this is reliated to the function callback
 
-    comm = Communication_with_babymind_via_socket_server()
-    # usb2can=get_data_from_usb2can_ixxat(power_supply)
-    usb2can = get_data_from_usb2can_ixxat()
-
-    # fen1.geometry('1300x650+0+0')
-    # fen1.resizable(width=False, height=False)
-    fen1.protocol("WM_DELETE_WINDOW", kill) #this is reliated to the function callback
-
-    # App=Application(fen1,comm,usb2can,power_supply)
-    App = Application(fen1, comm, usb2can)
+    App = Application(fen1)
     fen1.mainloop()
-    #fen1.update_idletasks()
-    #fen1.update()
