@@ -11,10 +11,14 @@
         width:40%;
         height: 700px;
 }
+#uploadDIV{
+        position: relative;
+        top:100px;
+}
 #pixelsDIV{
         background-color: blue;
         position: relative;
-        top: -200px;
+        top: -380px;
         left: 110%;
         width: 900px;
         height: 700px;

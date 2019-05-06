@@ -1323,7 +1323,7 @@ class Canon:
             #     self.queue_for_dtata_recorded_by_babymind.append(aux_name_file_recorded_by_babymind)
             indice_file_taking_data += 1
             self.queue_for_dtata_recorded_by_babymind.append(folder_result_acquisition_babymind+"/"+file_object)
-        self.get_boards_values_from_file()
+            self.get_boards_values_from_file()
             #time.sleep(2)
 
         print('\033[91m'+"acquisitiom of data is finish"+'\033[0m')
@@ -1361,7 +1361,7 @@ class Canon:
                 #if len(self.queue_for_dtata_recorded_by_babymind) == 0:
                 #    time.sleep(5)
             print("queue_for_dtata_recorded_by_babymind====",len(self.queue_for_dtata_recorded_by_babymind))
-            while len(self.queue_for_dtata_recorded_by_babymind)>0:
+            while len(self.queue_for_dtata_recorded_by_babymind)!=0:
                 file_to_open = self.queue_for_dtata_recorded_by_babymind[0]
                 del self.queue_for_dtata_recorded_by_babymind[0]
                 print("we analyse now %s in the queue"%file_to_open)
@@ -1839,15 +1839,15 @@ class Canon:
 
             self.list_mean_cosmicray_rate_HG.append(list_rate_components[0][0])
             self.list_std_cosmicray_rate_HG.append(list_rate_components[1][0])
-            self.list_mean_cosmicray_rate_LG.append(list_rate_components[2])
-            self.list_std_cosmicray_rate_LG.append(list_rate_components[3] )
-            self.list_mean_cosmicray_rate_tot.append(list_rate_components[4][0] )
-            self.list_std_cosmicray_rate_tot.append(list_rate_components[5][0] )
+            self.list_mean_cosmicray_rate_LG.append(list_rate_components[0][0])
+            self.list_std_cosmicray_rate_LG.append(list_rate_components[1][0])
+            self.list_mean_cosmicray_rate_tot.append(list_rate_components[0][0] )
+            self.list_std_cosmicray_rate_tot.append(list_rate_components[1][0] )
 
-            self.list_mean_trigger_rate_ampli.append(list_rate_components[6])
-            self.list_std_trigger_rate_ampli.append(list_rate_components[7])
-            self.list_mean_trigger_rate_tot.append(list_rate_components[8])
-            self.list_std_trigger_rate_tot.append(list_rate_components[9])
+            self.list_mean_trigger_rate_ampli.append(list_rate_components[2])
+            self.list_std_trigger_rate_ampli.append(list_rate_components[3])
+            self.list_mean_trigger_rate_tot.append(list_rate_components[2])
+            self.list_std_trigger_rate_tot.append(list_rate_components[3])
 
         self.flag_finish_function_get_boards_values_from_file=True
 
@@ -1964,7 +1964,6 @@ class Canon:
         self.axs_trigger_1 = self.fig_trigger.add_subplot(222)
         self.axs_trigger_2 = self.fig_trigger.add_subplot(223)
         self.axs_trigger_3 = self.fig_trigger.add_subplot(224)
-        self.analyse_file_contain_rate_aux()
         print("rate parameters for plot")
         print("threshold_x_shape_in_trigger_plot===",self.threshold_x_shape_in_trigger_plot)
         print("list_mean_cosmicray_rate_HG===",self.list_mean_cosmicray_rate_HG)
@@ -2033,10 +2032,11 @@ class Canon:
         self.axs_trigger_3_prime.set_xticks(self.threshold_x_shape_in_trigger_plot)
         self.axs_trigger_3_prime.set_xticklabels(self.threshold_x_shape_in_trigger_plot_in_PE_LG)
         #self.axs_trigger_3_prime.set_xlabel(" IN PE")
+        self.fig_trigger.show()
 
         self.canvas_trigger = FigureCanvasTkAgg(self.fig_trigger, master=self.fen3)
 
-        self.canvas_trigger.show()
+        # self.canvas_trigger.show()
 
         self.canvas_trigger.get_tk_widget().grid(row=1, column=1, rowspan=5, columnspan=6, padx=10, pady=5,
                                                sticky='NSEW')
