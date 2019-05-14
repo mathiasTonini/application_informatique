@@ -6,97 +6,74 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-        <div id='interface'>
-                <div id='entry'>
-                        <div>
-                                <label for="var">threshold HG :</label>
-                                <input type="number" id="threshold_HG" name="threshold_HG">
-                        </div>
-                                <label for="var">threshold LG </label>
-                                <input type="number" id="threshold_LG" name="threshold_LG">
-                        <div >
-                                <label for="var">threshold DAC </label>
-                                <input type="number" id="threshold_DAC" name="threshold_DAC">
-                        </div>
-                        <div>
-                         </div>
-                        <div id='Canon'>
-                                <div id='GAIN'>
-                                         Gain(HG/LG)
-                                        <input type="radio" id="HG" name="gain" value="HG">
-                                                <label for="HG">HG</label>
-                                        <input type="radio" id="LG" name="gain" value="LG">
-                                                <label for="LG">LG</label>
-                                        <input type="radio" id="TOT" name="gain" value="TOT">
-                                                <label for="TOT">TOT</label>
-                                <div id='trigger_conf'>
-                                        Choose Triger conf:
-                                            <FORM>
-                                            <SELECT name="trigerConf" size="1" id='confForm'>
-                                            <OPTION value='1'>1
-                                            <OPTION value='2'>2
-                                            <OPTION value='3'>3
-                                            </SELECT>
-                                            </FORM>
-
-                                </div>
-                                <div>
-                                        <label for="var">average DAC in trigger choosen:  </label>
-                                        <input type="number" id="averageDAC" name="averageDAC">
-                                </div>
-                                <div id='trigerChoosen'>
-                                        Choose
-                                        <FORM>
-                                        <SELECT name="trigerChoosForm" size="1" id='triggerChoosenForm'>
-                                        <OPTION value='DAC'>DAC
-                                        <OPTION value='PE'>PE
-                                        <OPTION value='Eie'>Eie
-                                        <OPTION value='Temp'>TEMP
-                                        </SELECT>
-                                        </FORM>
-                                </div>
-
-                                <!-- <div id='stop'>
-                                        <button type='button'>
-                                        stop
-                                        </button>
-                                </div>
-                                <div id='pause'>
-                                        <button type='button'>_
-                                        pause
-                                        </button>
-                                </div> -->
-                                <div id='selectionDrawTrigger'>
-                                        <div id='fromTo'>
-                                                 choose Threshold from:
-                                                <input type="number" name="thresholdFrom" id="thresholdFrom">
-                                                <label for="var"> choose Threshold to: </label>
-                                                <input type="number" id="thresholdTo" name="thresholdTo">
-
-                                        </div>
-                                        <div >
-                                                LG or HG
-                                                <FORM>
-                                                <SELECT name="choice" size="1" id='LGorHG'>
-                                                <OPTION value='LG'>LG
-                                                <OPTION value='HG'>HG
-
-                                                </SELECT>
-                                                </FORM>
-                                                <label for="var"> step of:  </label>
-                                                <input type="number" id="step" name="step">
-                                        </div>
-
-                                        <div id='drawCoscmicFlux'>
-                                                <button  id='drawCoscmicFluxButton'>
-                                                        draw trigger effisciency and cosmic ray flux
-                                                </button>
-                                        </div>
-                                </div>
-
-                        </div>
-                </div>
-                <div id = 'pixelsDIV'>
+    <div id='entry'>
+            <div>
+                <label for="var">threshold HG :</label>
+                    <input type="number" id="threshold_HG" name="threshold_HG">
+            </div>
+			<div>
+                <label for="var">threshold LG </label>
+                <input type="number" id="threshold_LG" name="threshold_LG">
+			</div>
+			<div>
+                <label for="var">threshold DAC </label>
+                 <input type="number" id="threshold_DAC" name="threshold_DAC">
+            </div>
+            <div id='GAIN'>
+                Gain(HG/LG)
+                <input type="radio" id="HG" name="gain" value="HG">
+                <label for="HG">HG</label>
+                <input type="radio" id="LG" name="gain" value="LG">
+                <label for="LG">LG</label>
+                <input type="radio" id="TOT" name="gain" value="TOT">
+                 <label for="TOT">TOT</label>
+			</div>
+			<div id='trigger_conf'>
+                Choose Triger conf:
+                <FORM>
+                <SELECT name="trigerConf" size="1" id='confForm'>
+                <OPTION value='1'>1
+                <OPTION value='2'>2
+                <OPTION value='3'>3
+                </SELECT>
+                </FORM>
+			</div>
+            <div>
+                <label for="var">average DAC in trigger choosen:  </label>
+                <input type="number" id="averageDAC" name="averageDAC">
+            </div>
+            <div id='trigerChoosen'>
+                Choose
+                <FORM>
+                <SELECT name="trigerChoosForm" size="1" id='triggerChoosenForm'>
+                <OPTION value='DAC'>DAC
+                <OPTION value='PE'>PE
+                <OPTION value='Eie'>Eie
+                <OPTION value='Temp'>TEMP
+                </SELECT>
+                </FORM>
+            </div>
+            <div id='selectionDrawTrigger'>
+				<FORM action='upload.php' method='post' enctype="multipart/form-data">
+                choose Threshold from:
+                <input type="number" name="thresholdFrom" id="thresholdFrom">
+                <label for="var"> choose Threshold to: </label>
+                <input type="number" id="thresholdTo" name="thresholdTo">
+                LG or HG
+                <SELECT name="choice" size="1" id='LGorHG'>
+                <OPTION value='LG'>LG
+                <OPTION value='HG'>HG
+                </SELECT>
+                <label for="var"> step of:  </label>
+                <input type="number" id="step" name="step">
+				<input type="file" name="upload[]" multiple="multiple" >												
+				<button  id='drawCoscmicFluxButton'>
+                <input type="submit" name="submit" value="click to draw cosmic flux"/>
+                </button>
+				</FORM>
+			</div>
+	</div>
+    <div id = 'pixelsDIV'>
                         <div id='ruche'>
                                 <div class='pixel', id='pix26'>
                                         <svg width="42" height="33">
@@ -956,20 +933,8 @@
                                                 <text x="13" y="25" sytle= "font-size: 8;"> 117 </text>
                                         </svg>
                                 </div>
-
-
-
-
-
-
                         </div>
                 </div>
-        </div>
-        <div id=uploadFile>
-                <p id="msg"></p>
-                <input type="file" id="multiFiles" name="files[]" multiple="multiple"/>
-                <button id="upload">Upload</button>
-        </div>
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
         <script src="babyMind.js"></script>
 

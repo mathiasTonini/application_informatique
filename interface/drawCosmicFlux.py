@@ -525,3 +525,4 @@ else:
             os.remove(element)
 
 draw(folder,depuis,to,step,choice)
+print("end.")
