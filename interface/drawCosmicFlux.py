@@ -2,6 +2,7 @@ from math import sin, cos, pi
 import os
 import numpy as np
 from math import cos, sin, sqrt, pi
+import random
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use("TkAgg")
@@ -10,6 +11,8 @@ from matplotlib import cm, colors
 import matplotlib.animation as animation
 import sys
 import matplotlib.image as image
+import time
+import ruche
 def getValues (folder):
     TDM_ID = 0b1110
     Hit_Amplitude_Id = 0b0011
@@ -78,13 +81,15 @@ def getValues (folder):
             gtrig_header_used_for_rate = {}
 
             calc_rate = dict((i, 0) for i in np.arange(0, 144))
-
+            start_time = time.time()
             duration = 0
             pqr = 0
             aux_dict_to_test_coincidence={}
 
             while line != b'':# and countss < 40000:
 
+                duration += time.time() - start_time
+                start_time = time.time()
                 countss += 1
 
 
@@ -340,6 +345,25 @@ def getValues (folder):
                                         if int(Word_Id, 2) == TDM_ID and int(line_out_b[4:6], 2) == 1:
                                             _break = 1
                                             break
+
+                                    if duration > time_allowed_to_display_events:
+                                        #add for ruche
+                                        data_LG.append([0]*144)
+                                        data_HG.append([0]*144)
+                                        data_time.append([0]*144)
+                                        index_max_sum = [np.sum(l) for l in data_LG].index(np.max([np.sum(l) for l in data_LG]))
+                                        data_electronics_LG = data_LG[index_max_sum]
+                                        data_electronics_HG = data_HG[index_max_sum]
+                                        data_electronics_tot = data_time[index_max_sum]
+
+                                        pqr = 0
+                                        data_LG = [[0] * 144]
+                                        data_HG = [[0] * 144]
+                                        data_time = [[0] * 144]
+
+                                        duration = 0
+                                        start_time = time.time()
+
                                     if _break:
                                         _break = 0
                                         break
@@ -411,6 +435,7 @@ def getValues (folder):
 
 
 def draw(folder,  depuis,to, step, choice):
+
     pedestal_LG=[15]*144
     Gain_LG=[4.5]*144
     pedestal_HG = [144]*144
@@ -430,22 +455,10 @@ def draw(folder,  depuis,to, step, choice):
     threshold_x_shape_in_trigger_plot_in_PE_LG=['%s'%e for e in threshold_x_shape_in_trigger_plot_in_PE_LG]
     threshold_x_shape_in_trigger_plot_in_PE_HG = ['%s' % e for e in threshold_x_shape_in_trigger_plot_in_PE_HG]
 
-    # print("rate parameters for plot")
-    # print("threshold_x_shape_in_trigger_plot===",threshold_x_shape_in_trigger_plot)
-    # print("list_mean_cosmicray_rate_HG===",list_mean_cosmicray_rate_HG)
-    # print("list_mean_cosmicray_rate_tot===",list_mean_cosmicray_rate_tot)
-    # print("list_mean_trigger_rate_ampli===",list_mean_trigger_rate_ampli)
-    # print("list_mean_trigger_rate_tot===",list_mean_trigger_rate_tot)
-
     fig_trigger_0 = plt.figure()
     fig_trigger_1 = plt.figure()
     fig_trigger_2 = plt.figure()
     fig_trigger_3 = plt.figure()
-
-    # axs_trigger_0 = fig_trigger.add_subplot(221)
-    # axs_trigger_1 = fig_trigger.add_subplot(222)
-    # axs_trigger_2 = fig_trigger.add_subplot(223)
-    # axs_trigger_3 = fig_trigger.add_subplot(224)
 
     axs_trigger_0 = fig_trigger_0.add_subplot(111)
     axs_trigger_1 = fig_trigger_1.add_subplot(111)
@@ -456,8 +469,6 @@ def draw(folder,  depuis,to, step, choice):
     axs_trigger_1.errorbar(threshold_x_shape_in_trigger_plot, list_mean_trigger_rate_tot, list_std_trigger_rate_tot, fmt='-o')
     axs_trigger_2.errorbar(threshold_x_shape_in_trigger_plot, list_mean_cosmicray_rate_HG, list_std_cosmicray_rate_HG, fmt='-o')
     axs_trigger_3.errorbar(threshold_x_shape_in_trigger_plot, list_mean_cosmicray_rate_tot, list_std_cosmicray_rate_tot, fmt='-o')
-
-    # fig_trigger.tight_layout()
 
     axs_trigger_0.set_yscale("log")
     axs_trigger_0.set_title("Trigger in amplitude")
@@ -514,6 +525,11 @@ depuis=int(sys.argv[2])
 to=int(sys.argv[3])
 step=int(sys.argv[4])
 choice=sys.argv[5]
+time_allowed_to_display_events=int(sys.argv[6])* 1e-3
+
+data_electronics_LG = np.array([random.randint(0, 300) for r in range(144)])
+data_electronics_HG = np.array([random.randint(0, 300) for r in range(144)])
+data_electronics_tot = np.array([random.randint(0, 300) for r in range(144)])
 
 #make the folder where the figures will be stored
 folderResult=folder+"/figures"
@@ -522,7 +538,7 @@ if not os.path.exists(folderResult):
 else:
     if os.listdir(folderResult) is not []:
         for element in os.listdir(folderResult):
-            os.remove(element)
+            os.remove(folderResult+"/"+element)
 
-draw(folder,depuis,to,step,choice)
-print("end.")
+draw(folder,depuis,to,step,choice)#make plots
+ruche.Makeruche(choice,data_electronics_HG,data_electronics_LG,data_electronics_tot,folderResult)

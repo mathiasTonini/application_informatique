@@ -7,7 +7,8 @@
 <?php
 
 // Get the values from the html form
-
+$time=$_POST['time'];
+$choice=$_POST['choice'];
 $drawFrom=$_POST['thresholdFrom'];
 $drawTo=$_POST['thresholdTo'];
 $step=$_POST['step'];
@@ -38,6 +39,20 @@ if ($step==NULL){
 else{
 	echo 'Value for the step: '.$step.'</br>';
 }
+if ($choice==NULL){
+	echo 'default value for choice HG </br>';
+	$choice="HG";
+}
+else{
+	echo 'You choose: '.$choice.'</br>';
+}
+if ($time==NULL){
+	echo 'default value for time =4000 </br>';
+	$time=4000;
+}
+else{
+	echo 'Value for the time: '.$time.'</br>';
+}
 
 //Create unique directory
 $dir="./uploads/".rand();
@@ -65,7 +80,7 @@ for ($i=0;$i < $total; $i++){
 //Create command to exec the python script
 ob_flush();
 flush();
-$commande="python drawCosmicFlux.py ".$dir." ".$drawFrom." ".$drawTo. " ".$step. " LG";
+$commande="python drawCosmicFlux.py ".$dir." ".$drawFrom." ".$drawTo. " ".$step. " ".$choice. " ".$time;
 echo "commande ".$commande. "</br>";
 exec($commande, $output,$ret_code);
 echo "Sortie: </br>";
@@ -82,13 +97,13 @@ if($dossier = opendir($images)){
 		if ($fichier != '.' && $fichier != '..'){
 			 $source=$images."/".$fichier;
 			 $counter++;
-			//echo "source: .".$source; 
-			echo 
+			//echo "source: .".$source;
+			echo
 				"<a href=\"".$source."\" download> Download ".$fichier."</a></br>"; //Download file
 			echo
-			
-				"<img 
-				src=\"".$source."\" 
+
+				"<img
+				src=\"".$source."\"
 				alt=\"".$fichier."\"
 				height=\"500px\"
 				width=\"500px\" />";
@@ -125,7 +140,7 @@ if($dossier = opendir($dir)){
 	while(false !== ($fichier = readdir($dossier))){
 		$source=$dir."/".$fichier;
 		unlink($source); // Supprime les fichiers daq
-	}	
+	}
 }
 closedir($dossier);
 rmdir($dir);
