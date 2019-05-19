@@ -7,6 +7,7 @@
 <?php
 
 // Get the values from the html form
+$dac=$_POST['dac'];
 $time=$_POST['time'];
 $choice=$_POST['choice'];
 $drawFrom=$_POST['thresholdFrom'];
@@ -63,31 +64,48 @@ $dir="./uploads/".rand();
 mkdir($dir);
 
 // Verify if files are daq, if not just delete them, if yes copy them to normal file for python script
-for ($i=0;$i < $total; $i++){
-	if ($_FILES["upload"]['type'][$i]=='application/octet-stream'){
-		$tempPath=$_FILES["upload"]['tmp_name'][$i];
-		$path=$dir."/".$_FILES["upload"]['name'][$i];
-		if(copy($tempPath, $path)){
+if ($_POST['data_base_or_upload']=='files'){
+	for ($i=0;$i < $total; $i++){
+		if ($_FILES["upload"]['type'][$i]=='application/octet-stream'){
+			$tempPath=$_FILES["upload"]['tmp_name'][$i];
+			$path=$dir."/".$_FILES["upload"]['name'][$i];
+			if(copy($tempPath, $path)){
+				unlink($tempPath);
+			}
+		}else{
+			echo 'file deleted: '.$_FILES["upload"]["name"];
+			$tempPath=$_FILES["upload"]['tmp_name'][$i];
 			unlink($tempPath);
 		}
-	}else{
-		echo 'file deleted: '.$_FILES["upload"]["name"];
-		$tempPath=$_FILES["upload"]['tmp_name'][$i];
-		unlink($tempPath);
 	}
 }
 
 //Create command to exec the python script
+if ($_POST['data_base_or_upload']=='files'){
+
+	$commande="python drawCosmicFlux.py ".$dir." ".$drawFrom." ".$drawTo. " ".$step." ".$dac. " ".$choice. " ".$time." 0 test"; //Last 0 means that we use uploaded files
+	echo "running ".$commande. " ... </br>";
+	ob_flush();
+	flush();
+}
+elseif($_POST['data_base_or_upload']=='data'){
+	$date=$_POST['year'].'-'.$_POST['month'].'-'.$_POST['day']; //make date as Year-mont-day
+	$findFiles='data-'.$date;
+	echo $findFiles.'</br>';
+	$commande="python drawCosmicFlux.py ".$dir." ".$drawFrom." ".$drawTo. " ".$step. " ".$dac." ".$choice. " ".$time." 1 ".$findFiles; //Last  means that we use uploaded files
+	echo "running ".$commande. " ... </br>";
+	ob_flush();
+	flush();
+}
+
+$output= exec($commande). "</br>";
+if ($output != 'end') //
+{
+	echo ' Sorry, something went wrong with the python script </br'.$output.'</br>';
+}
+
 ob_flush();
 flush();
-$commande="python drawCosmicFlux.py ".$dir." ".$drawFrom." ".$drawTo. " ".$step. " ".$choice. " ".$time;
-echo "commande ".$commande. "</br>";
-exec($commande, $output,$ret_code);
-echo "Sortie: </br>";
-foreach ($output as $value){
-	echo $value;
-}
-unset($value);
 
 //////Récupération des images
 $images=$dir.'/figures';
@@ -119,30 +137,45 @@ closedir($dossier);
 ob_flush();
 flush();
 
-//Delete files after user disconnect
+
+
+
+//Uncomment this part to clean files once user is disconnected
+
+
 ignore_user_abort(True);
-while (connection_aborted() !=1){
-	sleep(1); // wait until connection is aborded
-}
-
-//delet plot
-if($dossier = opendir($images)){
-		while(false !== ($fichier = readdir($dossier))){
-			$source=$images."/".$fichier;
-			unlink($source); // Supprimer tous les fichiers dans figures
+// Start infinite boucle
+while (1){
+	if (connection_aborted()){
+		$test=fopen('test.txt','w+');
+		fwrite($test,connection_status());
+		fclose($test);
+		//delet plot
+		if($dossier = opendir($images)){
+			while(false !== ($fichier = readdir($dossier))){
+				$source=$images."/".$fichier;
+				unlink($source); // Supprimer tous les fichiers dans figures
+			}
 		}
-}
-closedir($dossier);
-rmdir($images); //supprimer le dossier figures
+		closedir($dossier);
+		rmdir($images); //supprimer le dossier figures
 
-//delete temp folder
-if($dossier = opendir($dir)){
-	while(false !== ($fichier = readdir($dossier))){
-		$source=$dir."/".$fichier;
-		unlink($source); // Supprime les fichiers daq
+		//delete temp folder
+		if($dossier = opendir($dir)){
+			while(false !== ($fichier = readdir($dossier))){
+				$source=$dir."/".$fichier;
+				unlink($source); // Supprime les fichiers daq
+			}
+		}
+		closedir($dossier);
+		rmdir($dir);
+		exit;
+	}else{
+		echo "</br>";
+		ob_flush();
+		flush();
+		sleep(1); // wait until connection is aborded
 	}
 }
-closedir($dossier);
-rmdir($dir);
-exit;
+
  ?>

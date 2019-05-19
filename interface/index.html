@@ -39,8 +39,7 @@
                 </FORM>
 			</div>
             <div>
-                <label for="var">average DAC in trigger choosen:  </label>
-                <input type="number" id="averageDAC" name="averageDAC">
+                
             </div>
             <div id='trigerChoosen'>
                 Choose
@@ -54,27 +53,40 @@
                 </FORM>
             </div>
             <div id='selectionDrawTrigger'>
-				<FORM action='upload.php' method='post' enctype="multipart/form-data">
-                choose Threshold from:
-                <input type="number" name="thresholdFrom" id="thresholdFrom">
-                <label for="var"> choose Threshold to: </label>
-                <input type="number" id="thresholdTo" name="thresholdTo">
-                LG, HG or TOT
-                <SELECT name="choice" size="1" id='LGorHG'>
-                <OPTION value='LG'>LG
-                <OPTION value='HG'>HG
-                <OPTION value='TOT'>TOT
-                </SELECT>
-                <label for='var'> time allowed to display events </label>
-                <input type="number" id="time" name="time">
-                <label for="var"> step of:  </label>
-                <input type="number" id="step" name="step">
+			<FORM action='upload.php' method='post' enctype="multipart/form-data">
+				<label for="var">average DAC in trigger choosen:  </label> </br>
+				<input type="number" id="dac" name="dac">
+				choose Threshold from:
+				<input type="number" name="thresholdFrom" id="thresholdFrom"> </br>
+				<label for="var"> choose Threshold to: </label>
+				<input type="number" id="thresholdTo" name="thresholdTo"></br>
+				LG, HG or TOT
+				<SELECT name="choice" size="1" id='LGorHG'>
+				<OPTION value='LG'>LG
+				<OPTION value='HG'>HG
+				<OPTION value='TOT'>TOT
+				</SELECT></br>
+				from data base or upload files ?
+				<SELECT name="data_base_or_upload" size="1" id='LGorHG'>
+				<OPTION value='data'>data base
+				<OPTION value='files'>upload files
+				</SELECT></br>
+				<label for="var">  Year (0000)</label>
+				<input type="number" id="year" name="year">
+				<label for="var"> monts (00) </label>
+				<input type="number" id="month" name="month">
+				<label for="var"> day (00) </label>
+				<input type="number" id="day" name="day"></br>
+				<label for='var'> time allowed to display events </label>
+				<input type="number" id="time" name="time"></br>
+				<label for="var"> step of:  </label>
+				<input type="number" id="step" name="step"></br>
 				<input type="file" name="upload[]" multiple="multiple" >
 				<button  id='drawCoscmicFluxButton'>
-                <input type="submit" name="submit" value="click to draw cosmic flux"/>
-                </button>
-				</FORM>
-			</div>
+				<input type="submit" name="submit" value="click to draw cosmic flux"/>
+				</button>
+			</FORM>
+		</div>
 	</div>
     <div id = 'pixelsDIV'>
                         <div id='ruche'>

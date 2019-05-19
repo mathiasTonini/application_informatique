@@ -27,11 +27,19 @@ def getValues (folder):
 
     mean_trigger_rate=[]
     std_trigger_rate =[]
-
-    for file_to_open in os.listdir(folder):
-        formatFile=folder+"/"+file_to_open
-        if (os.path.isdir(formatFile)):
-            break; #Saute le dossier de reception
+    listeFichier=[]
+    # make a list of file to use
+    for folder_to_open in os.listdir(folder):
+        if os.path.isfile(folder+"/"+folder_to_open):
+            listeFichier.append(folder+"/"+folder_to_open)
+        else:
+            aTester=folder+"/"+folder_to_open
+            if os.listdir(aTester) is not []:
+                for file in os.listdir(aTester):
+                    element=aTester+"/"+file
+                    if os.path.isfile(element):
+                        listeFichier.append(element)
+    for formatFile in listeFichier:
         with open(formatFile, "r+b") as file:
             line = file.read(4)
             out_hex = ['{:02X}'.format(b) for b in line]
@@ -348,6 +356,9 @@ def getValues (folder):
 
                                     if duration > time_allowed_to_display_events:
                                         #add for ruche
+                                        data_electronics_LG = np.array([0 for r in range(144)])
+                                        data_electronics_HG = np.array([0 for r in range(144)])
+                                        data_electronics_tot = np.array([0 for r in range(144)])
                                         data_LG.append([0]*144)
                                         data_HG.append([0]*144)
                                         data_time.append([0]*144)
@@ -355,6 +366,16 @@ def getValues (folder):
                                         data_electronics_LG = data_LG[index_max_sum]
                                         data_electronics_HG = data_HG[index_max_sum]
                                         data_electronics_tot = data_time[index_max_sum]
+                                        list_of_pixels_on_events = [data_LG.index(item) for item in data_LG if item != 0]
+                                        if list_of_pixels_on_events !=[] :
+                                            if choice == "HG":
+                                                sum_to_have_more_event_ligthed = np.sum(data_electronics_HG)
+                                            elif  choice == "LG":
+                                                sum_to_have_more_event_ligthed = np.sum(data_electronics_LG)
+                                            elif choice() == "TOT":
+                                                        sum_to_have_more_event_ligthed = np.sum(data_electronics_tot)
+                                            if sum_to_have_more_event_ligthed >= dac:
+                                                ruche.Makeruche(choice,data_electronics_HG,data_electronics_LG,data_electronics_tot,folderResult) #draw pixels
 
                                         pqr = 0
                                         data_LG = [[0] * 144]
@@ -393,10 +414,12 @@ def getValues (folder):
                     Word_Id = line_out_b[0:4]
 
             for keys in sumX1_rate.keys():
-                if nbre_ampli_and_tot[keys] not in [0, 1]:
+                if (nbre_ampli_and_tot[keys] not in [0, 1]) :
                     mean_rate[keys].append(sumX1_rate[keys] / (nbre_ampli_and_tot[keys] - 1))
-                    std_rate[keys].append(
-                        sqrt((sumX2_rate[keys] / (nbre_ampli_and_tot[keys] - 1)) - mean_rate[keys][0] ** 2))
+                    if ((sumX2_rate[keys] / (nbre_ampli_and_tot[keys] - 1)) - mean_rate[keys][0] ** 2) >0:
+                        std_rate[keys].append( sqrt((sumX2_rate[keys] / (nbre_ampli_and_tot[keys] - 1)) - mean_rate[keys][0] ** 2))
+                    else:
+                        std_rate[keys].append(0)
 
                     # std_rate[keys].append(1)
                 else:
@@ -524,15 +547,20 @@ folder=sys.argv[1]
 depuis=int(sys.argv[2])
 to=int(sys.argv[3])
 step=int(sys.argv[4])
-choice=sys.argv[5]
-time_allowed_to_display_events=int(sys.argv[6])* 1e-3
+dac=int(sys.argv[5])
+choice=sys.argv[6]
+time_allowed_to_display_events=int(sys.argv[7])* 1e-3
 
-data_electronics_LG = np.array([random.randint(0, 300) for r in range(144)])
-data_electronics_HG = np.array([random.randint(0, 300) for r in range(144)])
-data_electronics_tot = np.array([random.randint(0, 300) for r in range(144)])
+#used for file from data or uploaded
+if (int(sys.argv[8])==1): #if we use the data bases
+    folderResult=folder+"/figures"
+    folder="./data/"+sys.argv[9] #assume that is where data are stored
+else:
+    folderResult=folder+"/figures"
+
+
 
 #make the folder where the figures will be stored
-folderResult=folder+"/figures"
 if not os.path.exists(folderResult):
     os.makedirs(folderResult)
 else:
@@ -541,4 +569,4 @@ else:
             os.remove(folderResult+"/"+element)
 
 draw(folder,depuis,to,step,choice)#make plots
-ruche.Makeruche(choice,data_electronics_HG,data_electronics_LG,data_electronics_tot,folderResult)
+print("end");

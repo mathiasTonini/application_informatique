@@ -30,7 +30,7 @@ def make_mini_cam_mathieu_with_node(size_edge_to_edge):
     '''
 
     mini_cam_mathieu_with_node = {}
-    with open("/home/mathias/Documents/unige/UNIGE/2eme/appliInfo/script/folder_result_acquisition_babymind/MappingTable_MiniCamera.txt","r") as file:
+    with open("MappingTable_MiniCamera.txt","r") as file:
         line=file.readline()
         line = file.readline().split("\n")[0].split("\t")
         while line[0] != "":
@@ -138,7 +138,7 @@ def Makeruche(choice,data_electronics_HG,data_electronics_LG,data_electronics_to
 
     ##This part of the code replace the plot_pixels_grid_bis() function
 
-    data_from_electronics=data_from_electronics.tolist()
+    #data_from_electronics=data_from_electronics.tolist()
     norm1 = matplotlib.colors.Normalize(np.min(data_from_electronics), np.max(data_from_electronics))
     cmap1 = matplotlib.cm.ScalarMappable(norm=norm1, cmap=matplotlib.cm.jet)
     cmap1.set_array([])
@@ -149,4 +149,7 @@ def Makeruche(choice,data_electronics_HG,data_electronics_LG,data_electronics_to
     cb_fen1.update_normal(cmap1)
     cb_fen1.draw_all()
     ruche.axis('equal')
-    fig_fen1.savefig(figPlace+"/fig_ruche.svg",format='svg')
+    counter=0
+    for file in os.listdir(figPlace):
+        counter=counter+1
+    fig_fen1.savefig(figPlace+"/fig_ruche"+str(counter)+".svg",format='svg')
