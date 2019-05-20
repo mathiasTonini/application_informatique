@@ -64,19 +64,17 @@ $dir="./uploads/".rand();
 mkdir($dir);
 
 // Verify if files are daq, if not just delete them, if yes copy them to normal file for python script
-if ($_POST['data_base_or_upload']=='files'){
-	for ($i=0;$i < $total; $i++){
-		if ($_FILES["upload"]['type'][$i]=='application/octet-stream'){
-			$tempPath=$_FILES["upload"]['tmp_name'][$i];
-			$path=$dir."/".$_FILES["upload"]['name'][$i];
-			if(copy($tempPath, $path)){
-				unlink($tempPath);
-			}
-		}else{
-			echo 'file deleted: '.$_FILES["upload"]["name"];
-			$tempPath=$_FILES["upload"]['tmp_name'][$i];
+for ($i=0;$i < $total; $i++){
+	if ($_FILES["upload"]['type'][$i]=='application/octet-stream'){
+		$tempPath=$_FILES["upload"]['tmp_name'][$i];
+		$path=$dir."/".$_FILES["upload"]['name'][$i];
+		if(copy($tempPath, $path)){
 			unlink($tempPath);
 		}
+	}else{
+		echo 'file deleted: '.$_FILES["upload"]["name"];
+		$tempPath=$_FILES["upload"]['tmp_name'][$i];
+		unlink($tempPath);
 	}
 }
 

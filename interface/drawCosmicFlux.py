@@ -28,17 +28,16 @@ def getValues (folder):
     mean_trigger_rate=[]
     std_trigger_rate =[]
     listeFichier=[]
-    # make a list of file to use
+    # make a list of file use
     for folder_to_open in os.listdir(folder):
         if os.path.isfile(folder+"/"+folder_to_open):
             listeFichier.append(folder+"/"+folder_to_open)
         else:
             aTester=folder+"/"+folder_to_open
             if os.listdir(aTester) is not []:
-                for file in os.listdir(aTester):
-                    element=aTester+"/"+file
-                    if os.path.isfile(element):
-                        listeFichier.append(element)
+                for file in aTester:
+                    if os.path.isfile(aTester):
+                        listeFichier.append(aTester+"/"+file)
     for formatFile in listeFichier:
         with open(formatFile, "r+b") as file:
             line = file.read(4)
@@ -381,7 +380,7 @@ def getValues (folder):
                                         data_LG = [[0] * 144]
                                         data_HG = [[0] * 144]
                                         data_time = [[0] * 144]
-
+                    
                                         duration = 0
                                         start_time = time.time()
 
@@ -414,12 +413,10 @@ def getValues (folder):
                     Word_Id = line_out_b[0:4]
 
             for keys in sumX1_rate.keys():
-                if (nbre_ampli_and_tot[keys] not in [0, 1]) :
+                if nbre_ampli_and_tot[keys] not in [0, 1]:
                     mean_rate[keys].append(sumX1_rate[keys] / (nbre_ampli_and_tot[keys] - 1))
-                    if ((sumX2_rate[keys] / (nbre_ampli_and_tot[keys] - 1)) - mean_rate[keys][0] ** 2) >0:
-                        std_rate[keys].append( sqrt((sumX2_rate[keys] / (nbre_ampli_and_tot[keys] - 1)) - mean_rate[keys][0] ** 2))
-                    else:
-                        std_rate[keys].append(0)
+                    std_rate[keys].append(
+                        sqrt((sumX2_rate[keys] / (nbre_ampli_and_tot[keys] - 1)) - mean_rate[keys][0] ** 2))
 
                     # std_rate[keys].append(1)
                 else:
@@ -550,14 +547,13 @@ step=int(sys.argv[4])
 dac=int(sys.argv[5])
 choice=sys.argv[6]
 time_allowed_to_display_events=int(sys.argv[7])* 1e-3
-
-#used for file from data or uploaded
 if (int(sys.argv[8])==1): #if we use the data bases
     folderResult=folder+"/figures"
-    folder="./data/"+sys.argv[9] #assume that is where data are stored
+    folder="home/data/"+argv[9] #assume that is where data are stored
 else:
     folderResult=folder+"/figures"
 
+#A Changer de place
 
 
 #make the folder where the figures will be stored
