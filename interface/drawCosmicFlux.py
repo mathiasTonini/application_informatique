@@ -35,8 +35,8 @@ def getValues (folder):
         else:
             aTester=folder+"/"+folder_to_open
             if os.listdir(aTester) is not []:
-                for file in aTester:
-                    if os.path.isfile(aTester):
+                for file in os.listdir(aTester):
+                    if os.path.isfile(aTester+"/"+file):
                         listeFichier.append(aTester+"/"+file)
     for formatFile in listeFichier:
         with open(formatFile, "r+b") as file:
@@ -415,9 +415,11 @@ def getValues (folder):
             for keys in sumX1_rate.keys():
                 if nbre_ampli_and_tot[keys] not in [0, 1]:
                     mean_rate[keys].append(sumX1_rate[keys] / (nbre_ampli_and_tot[keys] - 1))
-                    std_rate[keys].append(
-                        sqrt((sumX2_rate[keys] / (nbre_ampli_and_tot[keys] - 1)) - mean_rate[keys][0] ** 2))
-
+                    a=((sumX2_rate[keys] / (nbre_ampli_and_tot[keys] - 1)) - mean_rate[keys][0] ** 2)
+                    if a >0:
+                        std_rate[keys].append(sqrt((sumX2_rate[keys] / (nbre_ampli_and_tot[keys] - 1)) - mean_rate[keys][0] ** 2))
+                    else:
+                        std_rate[keys].append(0)
                     # std_rate[keys].append(1)
                 else:
                     mean_rate[keys].append(0)
@@ -425,8 +427,7 @@ def getValues (folder):
 
         if nbre_trigger_rate != 0:
             mean_trigger_rate.append(X1_trigger_rate / nbre_trigger_rate)
-            std_trigger_rate.append(sqrt((X2_trigger_rate / nbre_trigger_rate) - (
-                    X1_trigger_rate / nbre_trigger_rate) ** 2))
+            std_trigger_rate.append(sqrt((X2_trigger_rate / nbre_trigger_rate) - (X1_trigger_rate / nbre_trigger_rate) ** 2))
         else:
             mean_trigger_rate.append(0)
             std_trigger_rate.append(0)
@@ -470,11 +471,28 @@ def draw(folder,  depuis,to, step, choice):
         elif choice=="LG":
             var_threshold_LG=threshold_aux
             getValues(folder)
-    threshold_x_shape_in_trigger_plot_in_PE_LG=[(threshold_LG - np.mean(pedestal_LG))/np.mean(Gain_LG) for threshold_LG in threshold_x_shape_in_trigger_plot]
-    threshold_x_shape_in_trigger_plot_in_PE_HG = [(threshold_HG - np.mean(pedestal_HG)) / np.mean(Gain_HG) for threshold_HG in threshold_x_shape_in_trigger_plot]
+    threshold_x_shape_in_trigger_plot_in_PE_LG=[]
+    threshold_x_shape_in_trigger_plot_in_PE_HG=[]
+    
+    for threshold_LG in threshold_x_shape_in_trigger_plot:
+        a=(threshold_LG - np.mean(pedestal_LG))/np.mean(Gain_LG) 
+        if (a > 0):
+            threshold_x_shape_in_trigger_plot_in_PE_LG.append(a)
+        else:
+            threshold_x_shape_in_trigger_plot_in_PE_LG.append(1)
+     
+     
+    for threshold_HG in threshold_x_shape_in_trigger_plot:
+        a=(threshold_HG - np.mean(pedestal_HG)) / np.mean(Gain_HG)
+        if (a>0):
+            threshold_x_shape_in_trigger_plot_in_PE_HG.append(a)
+        else:
+            threshold_x_shape_in_trigger_plot_in_PE_HG.append(1)
+            
+    #threshold_x_shape_in_trigger_plot_in_PE_LG=[(threshold_LG - np.mean(pedestal_LG))/np.mean(Gain_LG) for threshold_LG in threshold_x_shape_in_trigger_plot]
+    #threshold_x_shape_in_trigger_plot_in_PE_HG = [(threshold_HG - np.mean(pedestal_HG)) / np.mean(Gain_HG) for threshold_HG in threshold_x_shape_in_trigger_plot]
     threshold_x_shape_in_trigger_plot_in_PE_LG=['%s'%e for e in threshold_x_shape_in_trigger_plot_in_PE_LG]
     threshold_x_shape_in_trigger_plot_in_PE_HG = ['%s' % e for e in threshold_x_shape_in_trigger_plot_in_PE_HG]
-
     fig_trigger_0 = plt.figure()
     fig_trigger_1 = plt.figure()
     fig_trigger_2 = plt.figure()
@@ -485,10 +503,12 @@ def draw(folder,  depuis,to, step, choice):
     axs_trigger_2 = fig_trigger_2.add_subplot(111)
     axs_trigger_3 = fig_trigger_3.add_subplot(111)
 
+
     axs_trigger_0.errorbar(threshold_x_shape_in_trigger_plot,list_mean_trigger_rate_ampli,list_std_trigger_rate_ampli,fmt='-o')
     axs_trigger_1.errorbar(threshold_x_shape_in_trigger_plot, list_mean_trigger_rate_tot, list_std_trigger_rate_tot, fmt='-o')
     axs_trigger_2.errorbar(threshold_x_shape_in_trigger_plot, list_mean_cosmicray_rate_HG, list_std_cosmicray_rate_HG, fmt='-o')
     axs_trigger_3.errorbar(threshold_x_shape_in_trigger_plot, list_mean_cosmicray_rate_tot, list_std_cosmicray_rate_tot, fmt='-o')
+    
 
     axs_trigger_0.set_yscale("log")
     axs_trigger_0.set_title("Trigger in amplitude")
@@ -497,7 +517,8 @@ def draw(folder,  depuis,to, step, choice):
     axs_trigger_0_prime.set_xlim(axs_trigger_0.get_xlim())
     axs_trigger_0_prime.set_xticks(threshold_x_shape_in_trigger_plot)
     axs_trigger_0_prime.set_xticklabels(threshold_x_shape_in_trigger_plot_in_PE_HG)
-
+ 
+    
     axs_trigger_1.set_yscale("log")
     axs_trigger_1.set_title("Trigger in tot")
     axs_trigger_1.grid()
@@ -506,6 +527,7 @@ def draw(folder,  depuis,to, step, choice):
     axs_trigger_1_prime.set_xticks(threshold_x_shape_in_trigger_plot)
     axs_trigger_1_prime.set_xticklabels(threshold_x_shape_in_trigger_plot_in_PE_HG)
 
+    
     axs_trigger_2.set_yscale("log")
     axs_trigger_2.set_title("CR flux in amplitude")
     axs_trigger_2.grid()
@@ -513,7 +535,7 @@ def draw(folder,  depuis,to, step, choice):
     axs_trigger_2_prime.set_xlim(axs_trigger_2.get_xlim())
     axs_trigger_2_prime.set_xticks(threshold_x_shape_in_trigger_plot)
     axs_trigger_2_prime.set_xticklabels(threshold_x_shape_in_trigger_plot_in_PE_LG)
-
+    
     axs_trigger_3.set_yscale("log")
     axs_trigger_3.set_title("CR flux in tot")
     axs_trigger_3.grid()
@@ -521,7 +543,6 @@ def draw(folder,  depuis,to, step, choice):
     axs_trigger_3_prime.set_xlim(axs_trigger_3.get_xlim())
     axs_trigger_3_prime.set_xticks(threshold_x_shape_in_trigger_plot)
     axs_trigger_3_prime.set_xticklabels(threshold_x_shape_in_trigger_plot_in_PE_LG)
-
     fig_trigger_0.savefig(folderResult+"/fig_trigger_0.svg",format='svg')
     fig_trigger_1.savefig(folderResult+"/fig_trigger_1.svg",format='svg')
     fig_trigger_2.savefig(folderResult+"/fig_trigger_2.svg",format='svg')
@@ -549,7 +570,7 @@ choice=sys.argv[6]
 time_allowed_to_display_events=int(sys.argv[7])* 1e-3
 if (int(sys.argv[8])==1): #if we use the data bases
     folderResult=folder+"/figures"
-    folder="home/data/"+argv[9] #assume that is where data are stored
+    folder="./data/"+sys.argv[9] #assume that is where data are stored
 else:
     folderResult=folder+"/figures"
 

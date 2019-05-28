@@ -64,22 +64,24 @@ $dir="./uploads/".rand();
 mkdir($dir);
 
 // Verify if files are daq, if not just delete them, if yes copy them to normal file for python script
-for ($i=0;$i < $total; $i++){
-	if ($_FILES["upload"]['type'][$i]=='application/octet-stream'){
-		$tempPath=$_FILES["upload"]['tmp_name'][$i];
-		$path=$dir."/".$_FILES["upload"]['name'][$i];
-		if(copy($tempPath, $path)){
-			unlink($tempPath);
-		}
-	}else{
-		echo 'file deleted: '.$_FILES["upload"]["name"];
-		$tempPath=$_FILES["upload"]['tmp_name'][$i];
-		unlink($tempPath);
-	}
-}
+
 
 //Create command to exec the python script
 if ($_POST['data_base_or_upload']=='files'){
+
+	for ($i=0;$i < $total; $i++){
+		if ($_FILES["upload"]['type'][$i]=='application/octet-stream'){
+		$tempPath=$_FILES["upload"]['tmp_name'][$i];
+		$path=$dir."/".$_FILES["upload"]['name'][$i];
+			if(copy($tempPath, $path)){
+				unlink($tempPath);
+			}
+		}else{
+			echo 'file deleted: '.$_FILES["upload"]["name"];
+			$tempPath=$_FILES["upload"]['tmp_name'][$i];
+			unlink($tempPath);
+		}
+	}
 
 	$commande="python drawCosmicFlux.py ".$dir." ".$drawFrom." ".$drawTo. " ".$step." ".$dac. " ".$choice. " ".$time." 0 test"; //Last 0 means that we use uploaded files
 	echo "running ".$commande. " ... </br>";
